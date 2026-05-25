@@ -14,6 +14,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TpoDashboardRouteImport } from './routes/tpo.dashboard'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentHomeRouteImport } from './routes/student.home'
 
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TpoDashboardRoute = TpoDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => TpoRoute,
+} as any)
 const StudentProfileRoute = StudentProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -58,18 +64,20 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
-  '/tpo': typeof TpoRoute
+  '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/dashboard': typeof TpoDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
-  '/tpo': typeof TpoRoute
+  '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/dashboard': typeof TpoDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +85,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
-  '/tpo': typeof TpoRoute
+  '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/dashboard': typeof TpoDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/dashboard'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,7 +128,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   StudentRoute: typeof StudentRouteWithChildren
-  TpoRoute: typeof TpoRoute
+  TpoRoute: typeof TpoRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -156,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tpo/dashboard': {
+      id: '/tpo/dashboard'
+      path: '/dashboard'
+      fullPath: '/tpo/dashboard'
+      preLoaderRoute: typeof TpoDashboardRouteImport
+      parentRoute: typeof TpoRoute
+    }
     '/student/profile': {
       id: '/student/profile'
       path: '/profile'
@@ -186,12 +205,22 @@ const StudentRouteChildren: StudentRouteChildren = {
 const StudentRouteWithChildren =
   StudentRoute._addFileChildren(StudentRouteChildren)
 
+interface TpoRouteChildren {
+  TpoDashboardRoute: typeof TpoDashboardRoute
+}
+
+const TpoRouteChildren: TpoRouteChildren = {
+  TpoDashboardRoute: TpoDashboardRoute,
+}
+
+const TpoRouteWithChildren = TpoRoute._addFileChildren(TpoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   StudentRoute: StudentRouteWithChildren,
-  TpoRoute: TpoRoute,
+  TpoRoute: TpoRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
