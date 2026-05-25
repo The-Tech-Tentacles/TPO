@@ -34,7 +34,7 @@ export function TpoLayout() {
   useEffect(() => { setOpen(false); }, [pathname]);
 
   if (!user || user.role === "student") return null;
-  const nav = allNav.filter((n) => n.roles.includes(user.role));
+  const nav = allNav.filter((n) => (n.roles as readonly string[]).includes(user.role));
 
   const Sidebar = (
     <aside className="flex h-full w-64 shrink-0 flex-col gap-1 border-r bg-sidebar p-3">
