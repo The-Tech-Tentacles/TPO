@@ -15,7 +15,11 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TpoStudentsRouteImport } from './routes/tpo.students'
+import { Route as TpoSettingsRouteImport } from './routes/tpo.settings'
+import { Route as TpoFeedRouteImport } from './routes/tpo.feed'
+import { Route as TpoFacultyRouteImport } from './routes/tpo.faculty'
 import { Route as TpoDashboardRouteImport } from './routes/tpo.dashboard'
+import { Route as TpoCompaniesRouteImport } from './routes/tpo.companies'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentHomeRouteImport } from './routes/student.home'
 
@@ -49,9 +53,29 @@ const TpoStudentsRoute = TpoStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => TpoRoute,
 } as any)
+const TpoSettingsRoute = TpoSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => TpoRoute,
+} as any)
+const TpoFeedRoute = TpoFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => TpoRoute,
+} as any)
+const TpoFacultyRoute = TpoFacultyRouteImport.update({
+  id: '/faculty',
+  path: '/faculty',
+  getParentRoute: () => TpoRoute,
+} as any)
 const TpoDashboardRoute = TpoDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => TpoRoute,
+} as any)
+const TpoCompaniesRoute = TpoCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
   getParentRoute: () => TpoRoute,
 } as any)
 const StudentProfileRoute = StudentProfileRouteImport.update({
@@ -73,7 +97,11 @@ export interface FileRoutesByFullPath {
   '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/companies': typeof TpoCompaniesRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/faculty': typeof TpoFacultyRoute
+  '/tpo/feed': typeof TpoFeedRoute
+  '/tpo/settings': typeof TpoSettingsRoute
   '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRoutesByTo {
@@ -84,7 +112,11 @@ export interface FileRoutesByTo {
   '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/companies': typeof TpoCompaniesRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/faculty': typeof TpoFacultyRoute
+  '/tpo/feed': typeof TpoFeedRoute
+  '/tpo/settings': typeof TpoSettingsRoute
   '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRoutesById {
@@ -96,7 +128,11 @@ export interface FileRoutesById {
   '/tpo': typeof TpoRouteWithChildren
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
+  '/tpo/companies': typeof TpoCompaniesRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/faculty': typeof TpoFacultyRoute
+  '/tpo/feed': typeof TpoFeedRoute
+  '/tpo/settings': typeof TpoSettingsRoute
   '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRouteTypes {
@@ -109,7 +145,11 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/companies'
     | '/tpo/dashboard'
+    | '/tpo/faculty'
+    | '/tpo/feed'
+    | '/tpo/settings'
     | '/tpo/students'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -120,7 +160,11 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/companies'
     | '/tpo/dashboard'
+    | '/tpo/faculty'
+    | '/tpo/feed'
+    | '/tpo/settings'
     | '/tpo/students'
   id:
     | '__root__'
@@ -131,7 +175,11 @@ export interface FileRouteTypes {
     | '/tpo'
     | '/student/home'
     | '/student/profile'
+    | '/tpo/companies'
     | '/tpo/dashboard'
+    | '/tpo/faculty'
+    | '/tpo/feed'
+    | '/tpo/settings'
     | '/tpo/students'
   fileRoutesById: FileRoutesById
 }
@@ -187,11 +235,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TpoStudentsRouteImport
       parentRoute: typeof TpoRoute
     }
+    '/tpo/settings': {
+      id: '/tpo/settings'
+      path: '/settings'
+      fullPath: '/tpo/settings'
+      preLoaderRoute: typeof TpoSettingsRouteImport
+      parentRoute: typeof TpoRoute
+    }
+    '/tpo/feed': {
+      id: '/tpo/feed'
+      path: '/feed'
+      fullPath: '/tpo/feed'
+      preLoaderRoute: typeof TpoFeedRouteImport
+      parentRoute: typeof TpoRoute
+    }
+    '/tpo/faculty': {
+      id: '/tpo/faculty'
+      path: '/faculty'
+      fullPath: '/tpo/faculty'
+      preLoaderRoute: typeof TpoFacultyRouteImport
+      parentRoute: typeof TpoRoute
+    }
     '/tpo/dashboard': {
       id: '/tpo/dashboard'
       path: '/dashboard'
       fullPath: '/tpo/dashboard'
       preLoaderRoute: typeof TpoDashboardRouteImport
+      parentRoute: typeof TpoRoute
+    }
+    '/tpo/companies': {
+      id: '/tpo/companies'
+      path: '/companies'
+      fullPath: '/tpo/companies'
+      preLoaderRoute: typeof TpoCompaniesRouteImport
       parentRoute: typeof TpoRoute
     }
     '/student/profile': {
@@ -225,12 +301,20 @@ const StudentRouteWithChildren =
   StudentRoute._addFileChildren(StudentRouteChildren)
 
 interface TpoRouteChildren {
+  TpoCompaniesRoute: typeof TpoCompaniesRoute
   TpoDashboardRoute: typeof TpoDashboardRoute
+  TpoFacultyRoute: typeof TpoFacultyRoute
+  TpoFeedRoute: typeof TpoFeedRoute
+  TpoSettingsRoute: typeof TpoSettingsRoute
   TpoStudentsRoute: typeof TpoStudentsRoute
 }
 
 const TpoRouteChildren: TpoRouteChildren = {
+  TpoCompaniesRoute: TpoCompaniesRoute,
   TpoDashboardRoute: TpoDashboardRoute,
+  TpoFacultyRoute: TpoFacultyRoute,
+  TpoFeedRoute: TpoFeedRoute,
+  TpoSettingsRoute: TpoSettingsRoute,
   TpoStudentsRoute: TpoStudentsRoute,
 }
 
