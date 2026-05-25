@@ -27,7 +27,7 @@ The ADCET TPP (Training & Placement Portal) is a full-stack web application that
 | State / Data Fetching | TanStack Query v5 |
 | Forms | React Hook Form + Zod |
 | Theme | next-themes (light / dark / system) |
-| Runtime | Bun |
+| Runtime | npm |
 
 ---
 
@@ -35,8 +35,8 @@ The ADCET TPP (Training & Placement Portal) is a full-stack web application that
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) `>= 1.3`
-- Node.js `>= 20` (for tooling compatibility)
+- Node.js `>= 20`
+- npm `>= 10`
 
 ### Installation
 
@@ -46,13 +46,13 @@ git clone https://github.com/The-Tech-Tentacles/TPO.git
 cd TPO
 
 # Install dependencies
-bun install
+npm install
 ```
 
 ### Development
 
 ```bash
-bun run dev
+npm run dev
 ```
 
 The app will be available at `http://localhost:3000`.
@@ -60,15 +60,15 @@ The app will be available at `http://localhost:3000`.
 ### Build
 
 ```bash
-bun run build
-bun run start
+npm run build
+npm run start
 ```
 
 ### Lint & Format
 
 ```bash
-bun run lint
-bun run format
+npm run lint
+npm run format
 ```
 
 ---

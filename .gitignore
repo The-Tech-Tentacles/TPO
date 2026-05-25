@@ -21,6 +21,10 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Bun (project uses npm)
+bun.lock
+bunfig.toml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
