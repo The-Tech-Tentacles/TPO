@@ -14,6 +14,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TpoStudentsRouteImport } from './routes/tpo.students'
 import { Route as TpoDashboardRouteImport } from './routes/tpo.dashboard'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentHomeRouteImport } from './routes/student.home'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TpoStudentsRoute = TpoStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => TpoRoute,
+} as any)
 const TpoDashboardRoute = TpoDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/student/home': typeof StudentHomeRoute
   '/student/profile': typeof StudentProfileRoute
   '/tpo/dashboard': typeof TpoDashboardRoute
+  '/tpo/students': typeof TpoStudentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/student/home'
     | '/student/profile'
     | '/tpo/dashboard'
+    | '/tpo/students'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/student/home'
     | '/student/profile'
     | '/tpo/dashboard'
+    | '/tpo/students'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/student/home'
     | '/student/profile'
     | '/tpo/dashboard'
+    | '/tpo/students'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -168,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tpo/students': {
+      id: '/tpo/students'
+      path: '/students'
+      fullPath: '/tpo/students'
+      preLoaderRoute: typeof TpoStudentsRouteImport
+      parentRoute: typeof TpoRoute
+    }
     '/tpo/dashboard': {
       id: '/tpo/dashboard'
       path: '/dashboard'
@@ -207,10 +226,12 @@ const StudentRouteWithChildren =
 
 interface TpoRouteChildren {
   TpoDashboardRoute: typeof TpoDashboardRoute
+  TpoStudentsRoute: typeof TpoStudentsRoute
 }
 
 const TpoRouteChildren: TpoRouteChildren = {
   TpoDashboardRoute: TpoDashboardRoute,
+  TpoStudentsRoute: TpoStudentsRoute,
 }
 
 const TpoRouteWithChildren = TpoRoute._addFileChildren(TpoRouteChildren)
