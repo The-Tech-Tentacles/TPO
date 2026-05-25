@@ -1,12 +1,4 @@
-import type {
-  Student,
-  TPOFaculty,
-  Company,
-  Post,
-  PendingItem,
-  AppSettings,
-  User,
-} from "./types";
+import type { Student, TPOFaculty, Company, Post, PendingItem, AppSettings, User } from "./types";
 
 export const SETTINGS: AppSettings = {
   collegeName: "ADCET — Ashokrao Mane College of Engineering",
@@ -337,7 +329,6 @@ export const POSTS: Post[] = [
     ],
   },
 ];
-
 
 export const PENDING: PendingItem[] = [
   {

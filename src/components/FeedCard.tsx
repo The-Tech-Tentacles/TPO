@@ -137,17 +137,17 @@ export function FeedCard({
                             ...p,
                             pollVotedOptionId: opt.id,
                             pollOptions: p.pollOptions?.map((o) =>
-                              o.id === opt.id ? { ...o, votes: o.votes + 1 } : o
+                              o.id === opt.id ? { ...o, votes: o.votes + 1 } : o,
                             ),
                           }
-                        : p
+                        : p,
                     ),
                   }));
                 }}
                 disabled={!!post.pollVotedOptionId}
                 className={cn(
                   "relative w-full overflow-hidden rounded-lg border p-3 text-left text-sm transition-colors",
-                  isVoted ? "border-emerald-500 bg-emerald-50" : "hover:bg-muted"
+                  isVoted ? "border-emerald-500 bg-emerald-50" : "hover:bg-muted",
                 )}
               >
                 {post.pollVotedOptionId && (

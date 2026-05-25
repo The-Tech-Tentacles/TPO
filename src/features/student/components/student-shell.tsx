@@ -57,7 +57,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
                 <Icon
                   className={cn(
                     "size-4 transition-transform duration-300",
-                    active && "stroke-[2.5px]"
+                    active && "stroke-[2.5px]",
                   )}
                 />
                 <span>{tab.label}</span>
@@ -94,10 +94,12 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
                 <Icon
                   className={cn(
                     "size-4 sm:size-4.5 transition-transform duration-300",
-                    active && "stroke-[2.5px]"
+                    active && "stroke-[2.5px]",
                   )}
                 />
-                <span className="tracking-wide leading-tight px-0.5 max-w-full truncate">{tab.label === "Help & Support" ? "Support" : tab.label}</span>
+                <span className="tracking-wide leading-tight px-0.5 max-w-full truncate">
+                  {tab.label === "Help & Support" ? "Support" : tab.label}
+                </span>
               </Link>
             );
           })}

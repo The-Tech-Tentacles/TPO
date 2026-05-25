@@ -54,7 +54,10 @@ export function StudentHomePage() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="shrink-0 gap-2 bg-card border-border/60 shadow-sm px-3 sm:px-4">
+            <Button
+              variant="outline"
+              className="shrink-0 gap-2 bg-card border-border/60 shadow-sm px-3 sm:px-4"
+            >
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="hidden sm:inline-block">{active === "All" ? "Filter" : active}</span>
             </Button>

@@ -43,8 +43,10 @@ function useInView(threshold = 0.3) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold }
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -82,8 +84,14 @@ function StatCard({
 }
 
 const recruiters = [
-  "TCS", "Cognizant", "Accenture", "Capgemini",
-  "Wipro", "Tech Mahindra", "Hexaware", "Infosys",
+  "TCS",
+  "Cognizant",
+  "Accenture",
+  "Capgemini",
+  "Wipro",
+  "Tech Mahindra",
+  "Hexaware",
+  "Infosys",
 ];
 
 export default function HomePage() {
@@ -91,7 +99,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50 antialiased">
-
       {/* ── Navbar ─────────────────────────────────────────────────────────── */}
       <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -152,8 +159,11 @@ export default function HomePage() {
 
             <p className="text-lg sm:text-xl leading-8 text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto">
               Welcome to the official Training &amp; Placement Portal of{" "}
-              <span className="font-semibold text-slate-800 dark:text-slate-100">ADCET, Ashta.</span>{" "}
-              We connect academic excellence with industry opportunity — shaping engineers into industry leaders.
+              <span className="font-semibold text-slate-800 dark:text-slate-100">
+                ADCET, Ashta.
+              </span>{" "}
+              We connect academic excellence with industry opportunity — shaping engineers into
+              industry leaders.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -177,10 +187,7 @@ export default function HomePage() {
       {/* ── Stats ──────────────────────────────────────────────────────────── */}
       <section className="py-16 bg-slate-50 dark:bg-slate-950 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            ref={statsRef}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
-          >
+          <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <StatCard
               value={1800}
               suffix="+"
@@ -244,7 +251,8 @@ export default function HomePage() {
               Everything you need, in one place
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              From skill-building workshops to live job drives — the ADCET Training &amp; Placement Cell supports every step of your career journey.
+              From skill-building workshops to live job drives — the ADCET Training &amp; Placement
+              Cell supports every step of your career journey.
             </p>
           </div>
 
@@ -278,7 +286,9 @@ export default function HomePage() {
                 <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-500/15 flex items-center justify-center mb-5 group-hover:bg-emerald-600 transition-colors">
                   <Icon className="h-5 w-5 text-emerald-700 dark:text-emerald-400 group-hover:text-white transition-colors" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50 mb-2">{title}</h3>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50 mb-2">
+                  {title}
+                </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
               </div>
             ))}
@@ -298,7 +308,8 @@ export default function HomePage() {
                 State-of-the-art placement facilities
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
-                Our campus is purpose-built for efficient, large-scale recruitment drives — giving every visiting company a seamless hiring experience.
+                Our campus is purpose-built for efficient, large-scale recruitment drives — giving
+                every visiting company a seamless hiring experience.
               </p>
               <Link
                 href="/login"
@@ -334,8 +345,12 @@ export default function HomePage() {
                     <Icon className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-1">{title}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-1">
+                      {title}
+                    </h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                      {desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -345,7 +360,10 @@ export default function HomePage() {
       </section>
 
       {/* ── Contact ────────────────────────────────────────────────────────── */}
-      <section id="contact" className="py-24 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
+      <section
+        id="contact"
+        className="py-24 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-emerald-900 dark:bg-emerald-950 rounded-3xl overflow-hidden shadow-xl">
             <div className="grid md:grid-cols-2">
@@ -356,7 +374,8 @@ export default function HomePage() {
                 </span>
                 <h2 className="text-3xl font-bold text-white mb-3">Get in Touch</h2>
                 <p className="text-emerald-100/80 mb-10 text-base leading-relaxed">
-                  Contact the Training &amp; Placement Cell for recruitment partnerships, student enquiries, or general information.
+                  Contact the Training &amp; Placement Cell for recruitment partnerships, student
+                  enquiries, or general information.
                 </p>
 
                 <div className="space-y-5">
@@ -365,7 +384,9 @@ export default function HomePage() {
                       <Phone className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">Phone</p>
+                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">
+                        Phone
+                      </p>
                       <a
                         href="tel:8055728941"
                         className="text-base font-semibold text-white hover:text-emerald-200 transition-colors"
@@ -380,7 +401,9 @@ export default function HomePage() {
                       <Mail className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">Email</p>
+                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">
+                        Email
+                      </p>
                       <a
                         href="mailto:dean_tpo@adcet.in"
                         className="text-base font-semibold text-white hover:text-emerald-200 transition-colors block"
@@ -401,9 +424,12 @@ export default function HomePage() {
                       <MapPin className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">Address</p>
+                      <p className="text-xs font-medium text-emerald-300/70 uppercase tracking-wider">
+                        Address
+                      </p>
                       <p className="text-sm text-white leading-relaxed">
-                        Ashta, Sangli – Miraj – Kolhapur Rd,<br />
+                        Ashta, Sangli – Miraj – Kolhapur Rd,
+                        <br />
                         Ashta, Maharashtra 416301
                       </p>
                     </div>
@@ -422,7 +448,9 @@ export default function HomePage() {
                     Dean — Training &amp; Placement Officer
                   </p>
                   <p className="text-emerald-100/80 text-sm leading-relaxed mb-6">
-                    Our dedicated team of staff and student coordinators work tirelessly to ensure the best opportunities for students and a seamless hiring experience for corporate partners.
+                    Our dedicated team of staff and student coordinators work tirelessly to ensure
+                    the best opportunities for students and a seamless hiring experience for
+                    corporate partners.
                   </p>
                   <div className="w-full h-px bg-white/15 mb-5" />
                   <div className="flex items-center gap-2">
@@ -442,11 +470,10 @@ export default function HomePage() {
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-
             {/* Left — copyright */}
             <p className="text-xs text-slate-400 dark:text-slate-500 text-center md:text-left">
-              &copy; {new Date().getFullYear()} Annasaheb Dange College of Engineering and Technology, Ashta.{" "}
-              <span className="hidden sm:inline">All rights reserved.</span>
+              &copy; {new Date().getFullYear()} Annasaheb Dange College of Engineering and
+              Technology, Ashta. <span className="hidden sm:inline">All rights reserved.</span>
             </p>
 
             {/* Right — attribution + toggle */}
@@ -463,11 +490,9 @@ export default function HomePage() {
                 </a>
               </p>
             </div>
-
           </div>
         </div>
       </footer>
-
     </div>
   );
 }

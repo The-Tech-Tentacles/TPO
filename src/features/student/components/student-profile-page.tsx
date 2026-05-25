@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -181,6 +182,20 @@ const emptyStudent = (name: string, email: string, id: string): Student => ({
   projects: "",
   photoFileName: "",
   resumeFileName: "",
+  fatherName: "",
+  fatherOccupation: "",
+  fatherMobile: "",
+  fatherEmail: "",
+  fatherSalary: 0,
+  motherName: "",
+  motherOccupation: "",
+  motherMobile: "",
+  motherEmail: "",
+  motherSalary: 0,
+  tenthMarksheetFileName: "",
+  twelfthMarksheetFileName: "",
+  aadharFileName: "",
+  yearMarksheetFileNames: {},
 });
 
 export function StudentProfilePage() {
@@ -249,6 +264,8 @@ export function StudentProfilePage() {
   const [deletingExperienceIndex, setDeletingExperienceIndex] = useState<number | null>(null);
   const [deletingAchievementIndex, setDeletingAchievementIndex] = useState<number | null>(null);
   const [professionalBodyDraft, setProfessionalBodyDraft] = useState("");
+  const [backlogDraft, setBacklogDraft] = useState({ sem: 1, subject: "" });
+  const [backlogOpen, setBacklogOpen] = useState(false);
 
   const update = <K extends keyof Student>(k: K, v: Student[K]) =>
     setDraft((d) => ({ ...d, [k]: v }));
@@ -304,12 +321,11 @@ export function StudentProfilePage() {
     () => [
       {
         title: "Identity & Contact",
-        done: !!(
-          draft.firstName &&
-          draft.surname &&
-          phoneValid(draft.mobile) &&
-          phoneValid(draft.parentsMobile ?? "")
-        ),
+        done: !!(draft.firstName && draft.surname && phoneValid(draft.mobile)),
+      },
+      {
+        title: "Parents Info",
+        done: !!(draft.fatherName && draft.motherName && phoneValid(draft.parentsMobile ?? "")),
       },
       {
         title: "Academic & Eligibility",
@@ -319,6 +335,10 @@ export function StudentProfilePage() {
           draft.aggregateTillCurrentSemester &&
           draft.urnNumber
         ),
+      },
+      {
+        title: "Previous Education",
+        done: !!(draft.tenth?.percentage && draft.twelfth?.percentage),
       },
       {
         title: "Career Preferences & Achievements",
@@ -376,8 +396,12 @@ export function StudentProfilePage() {
           </div>
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 dark:bg-emerald-900/30">
-              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Completion</span>
-              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{pct}%</span>
+              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                Completion
+              </span>
+              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                {pct}%
+              </span>
             </div>
           </div>
         </div>
@@ -385,7 +409,8 @@ export function StudentProfilePage() {
       </Card>
 
       <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 text-sm text-amber-800 dark:border-amber-900/30 dark:bg-amber-900/10 dark:text-amber-400">
-        <span className="font-semibold">Note:</span> Before exiting, make sure you save your draft so you don't lose your progress.
+        <span className="font-semibold">Note:</span> Before exiting, make sure you save your draft
+        so you don't lose your progress.
       </div>
 
       {sections.map((sec, idx) => {
@@ -426,98 +451,202 @@ export function StudentProfilePage() {
                         <Input
                           value={draft.firstName ?? ""}
                           onChange={(e) => update("firstName", e.target.value)}
+                          placeholder="e.g. John"
                         />
                       </Field>
                       <Field label="Middle Name">
                         <Input
                           value={draft.middleName ?? ""}
                           onChange={(e) => update("middleName", e.target.value)}
+                          placeholder="e.g. Robert"
                         />
                       </Field>
                       <Field label="Surname">
                         <Input
                           value={draft.surname ?? ""}
                           onChange={(e) => update("surname", e.target.value)}
+                          placeholder="e.g. Doe"
                         />
                       </Field>
                     </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Field label="Email address">
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <Field label="Date of Birth">
+                        <DatePicker
+                          date={draft.dob ? new Date(draft.dob) : undefined}
+                          setDate={(d) => update("dob", d ? d.toISOString() : undefined)}
+                          placeholder="Select Date of Birth"
+                        />
+                      </Field>
+                      <Field label="Email Address">
                         <Input
                           value={draft.emailAddress ?? ""}
                           onChange={(e) => {
                             update("emailAddress", e.target.value);
                             update("emailId", e.target.value);
                           }}
+                          placeholder="e.g. john.doe@example.com"
                         />
                       </Field>
-                      <Field label="Mobile Number (10 digits, no 0/91)">
+                      <Field label="Mobile Number">
                         <Input
                           value={draft.mobile}
                           onChange={(e) => update("mobile", toPhone(e.target.value))}
                           maxLength={10}
+                          placeholder="e.g. 9876543210"
                           className={
                             draft.mobile && !phoneValid(draft.mobile) ? "border-destructive" : ""
                           }
                         />
                       </Field>
                     </div>
-                    <div className="rounded-lg border bg-card p-3 space-y-3">
-                      <p className="text-sm font-medium">Parent Details</p>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <Field label="Parent Name">
-                          <Input
-                            value={draft.parentName ?? ""}
-                            onChange={(e) => update("parentName", e.target.value)}
-                            placeholder="e.g. Rajesh Sharma"
-                          />
-                        </Field>
-                        <Field label="Relation">
-                          <Input
-                            value={draft.parentRelation ?? ""}
-                            onChange={(e) => update("parentRelation", e.target.value)}
-                            placeholder="e.g. Father / Mother / Guardian"
-                          />
-                        </Field>
-                      </div>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <Field label="Parent Mobile Number (10 digits, no 0/91)">
-                          <Input
-                            value={draft.parentsMobile ?? ""}
-                            onChange={(e) => update("parentsMobile", toPhone(e.target.value))}
-                            maxLength={10}
-                            className={
-                              draft.parentsMobile && !phoneValid(draft.parentsMobile)
-                                ? "border-destructive"
-                                : ""
-                            }
-                          />
-                        </Field>
-                        <Field label="Parent Email (Optional)">
-                          <Input
-                            type="email"
-                            value={draft.parentEmail ?? ""}
-                            onChange={(e) => update("parentEmail", e.target.value)}
-                            placeholder="e.g. parent@email.com"
-                          />
-                        </Field>
-                      </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="Caste">
+                        <Input
+                          value={draft.caste ?? ""}
+                          onChange={(e) => update("caste", e.target.value)}
+                          placeholder="e.g. Hindu - Maratha"
+                        />
+                      </Field>
+                      <Field label="Category">
+                        <Input
+                          value={draft.category ?? ""}
+                          onChange={(e) => update("category", e.target.value)}
+                          placeholder="e.g. OBC / SC / ST / General"
+                        />
+                      </Field>
                     </div>
-                    <Field label="Caste">
-                      <Input
-                        value={draft.caste ?? ""}
-                        onChange={(e) => update("caste", e.target.value)}
-                      />
-                    </Field>
                   </>
                 )}
 
                 {idx === 1 && (
                   <>
+                    {/* Father Details */}
+                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                      <p className="text-sm font-semibold border-b pb-2">Father's Details</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Father's Name">
+                          <Input
+                            value={draft.fatherName ?? ""}
+                            onChange={(e) => update("fatherName", e.target.value)}
+                            placeholder="e.g. Rajesh Sharma"
+                          />
+                        </Field>
+                        <Field label="Father's Occupation">
+                          <Input
+                            value={draft.fatherOccupation ?? ""}
+                            onChange={(e) => update("fatherOccupation", e.target.value)}
+                            placeholder="e.g. Farmer / Business"
+                          />
+                        </Field>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Father's Mobile">
+                          <Input
+                            value={draft.fatherMobile ?? ""}
+                            onChange={(e) => update("fatherMobile", toPhone(e.target.value))}
+                            maxLength={10}
+                            placeholder="e.g. 9876543210"
+                            className={
+                              draft.fatherMobile && !phoneValid(draft.fatherMobile)
+                                ? "border-destructive"
+                                : ""
+                            }
+                          />
+                        </Field>
+                        <Field label="Father's Email (Optional)">
+                          <Input
+                            type="email"
+                            value={draft.fatherEmail ?? ""}
+                            onChange={(e) => update("fatherEmail", e.target.value)}
+                            placeholder="e.g. father@email.com"
+                          />
+                        </Field>
+                      </div>
+                      <Field label="Father's Annual Salary / Income (LPA)">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={0}
+                            step={0.1}
+                            value={draft.fatherSalary || ""}
+                            onChange={(e) => update("fatherSalary", +e.target.value)}
+                            placeholder="e.g. 3.5"
+                          />
+                          <span className="shrink-0 text-sm font-medium text-muted-foreground">
+                            LPA
+                          </span>
+                        </div>
+                      </Field>
+                    </div>
+
+                    {/* Mother Details */}
+                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                      <p className="text-sm font-semibold border-b pb-2">Mother's Details</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Mother's Name">
+                          <Input
+                            value={draft.motherName ?? ""}
+                            onChange={(e) => update("motherName", e.target.value)}
+                            placeholder="e.g. Sunita Sharma"
+                          />
+                        </Field>
+                        <Field label="Mother's Occupation">
+                          <Input
+                            value={draft.motherOccupation ?? ""}
+                            onChange={(e) => update("motherOccupation", e.target.value)}
+                            placeholder="e.g. Homemaker / Teacher"
+                          />
+                        </Field>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Mother's Mobile">
+                          <Input
+                            value={draft.motherMobile ?? ""}
+                            onChange={(e) => update("motherMobile", toPhone(e.target.value))}
+                            maxLength={10}
+                            placeholder="e.g. 9876543210"
+                            className={
+                              draft.motherMobile && !phoneValid(draft.motherMobile)
+                                ? "border-destructive"
+                                : ""
+                            }
+                          />
+                        </Field>
+                        <Field label="Mother's Email (Optional)">
+                          <Input
+                            type="email"
+                            value={draft.motherEmail ?? ""}
+                            onChange={(e) => update("motherEmail", e.target.value)}
+                            placeholder="e.g. mother@email.com"
+                          />
+                        </Field>
+                      </div>
+                      <Field label="Mother's Annual Salary / Income (LPA)">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={0}
+                            step={0.1}
+                            value={draft.motherSalary || ""}
+                            onChange={(e) => update("motherSalary", +e.target.value)}
+                            placeholder="e.g. 2"
+                          />
+                          <span className="shrink-0 text-sm font-medium text-muted-foreground">
+                            LPA
+                          </span>
+                        </div>
+                      </Field>
+                    </div>
+                  </>
+                )}
+
+                {idx === 2 && (
+                  <>
                     <Field label="URN Number">
                       <Input
                         value={draft.urnNumber ?? ""}
                         onChange={(e) => update("urnNumber", e.target.value)}
+                        placeholder="e.g. 1234567890"
                       />
                     </Field>
                     <Field label="Department">
@@ -564,77 +693,395 @@ export function StudentProfilePage() {
                         </Select>
                       </Field>
                     </div>
-                    <Field label="Aggregate till current semester">
+                    <Field label="Aggregate till current semester (%)">
                       <Input
                         type="number"
                         min={0}
                         max={100}
                         value={draft.aggregateTillCurrentSemester || ""}
                         onChange={(e) => update("aggregateTillCurrentSemester", +e.target.value)}
+                        placeholder="e.g. 85.5"
                       />
                     </Field>
-                    <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-  <span className="text-sm font-medium">Do you currently have live backlogs?</span>
-  <div className="flex items-center gap-3">
-    <span className="text-sm text-muted-foreground">{draft.activeBacklogs ? "Yes" : "No"}</span>
-    <Switch
-      checked={!!draft.activeBacklogs}
-      onCheckedChange={(v) => {
-        update("activeBacklogs", v);
-        if (!v) update("liveBacklogsOrNa", "NA");
-        if (v && (draft.liveBacklogsOrNa ?? "NA") === "NA") {
-          update("liveBacklogsOrNa", "");
-        }
-      }}
-    />
-  </div>
-</div>
-                    {draft.activeBacklogs ? (
-                      <Field label="Mention your live backlogs">
-                        <Input
-                          value={draft.liveBacklogsOrNa ?? ""}
-                          onChange={(e) => update("liveBacklogsOrNa", e.target.value)}
-                          placeholder="e.g. Sem 5 - Mathematics II"
+                    {/* Backlogs — collapsible */}
+                    <div className="rounded-lg border bg-card overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setBacklogOpen((o) => !o)}
+                        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-muted/40 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold">Backlogs</p>
+                          {(() => {
+                            const entries: { sem: number; subject: string }[] = (() => {
+                              try {
+                                return JSON.parse(draft.liveBacklogsOrNa ?? "[]");
+                              } catch {
+                                return [];
+                              }
+                            })();
+                            return (
+                              <>
+                                {entries.length > 0 && (
+                                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                    {entries.length} total
+                                  </span>
+                                )}
+                                {draft.activeBacklogs && (
+                                  <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                    Active
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
+                        <ChevronDown
+                          className={`size-4 text-muted-foreground transition-transform duration-200 ${backlogOpen ? "rotate-180" : ""}`}
                         />
-                      </Field>
-                    ) : null}
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Field label="Parents Income (Range)">
-                        <Input
-                          value={draft.parentsIncomeRange ?? ""}
-                          onChange={(e) => update("parentsIncomeRange", e.target.value)}
-                          placeholder="e.g. 3-6 LPA"
-                        />
-                      </Field>
-                      <Field label="Occupation of Parent">
-                        <Input
-                          value={draft.parentOccupation ?? ""}
-                          onChange={(e) => update("parentOccupation", e.target.value)}
-                        />
-                      </Field>
+                      </button>
+
+                      {backlogOpen && (
+                        <div className="px-4 pb-4 space-y-3 border-t pt-3">
+                          {/* Add form */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <Field label="Semester" className="w-28 shrink-0">
+                                <Select
+                                  value={String(backlogDraft.sem)}
+                                  onValueChange={(v) => {
+                                    const sem = +v;
+                                    setBacklogDraft((d) => ({ ...d, sem }));
+                                    if (sem === draft.currentSemester)
+                                      update("activeBacklogs", true);
+                                    else update("activeBacklogs", false);
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Sem" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from(
+                                      { length: draft.currentSemester || 8 },
+                                      (_, i) => i + 1,
+                                    ).map((s) => (
+                                      <SelectItem key={s} value={String(s)}>
+                                        Sem {s}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </Field>
+                              <Field label="Subject Name" className="flex-1">
+                                <Input
+                                  value={backlogDraft.subject}
+                                  onChange={(e) =>
+                                    setBacklogDraft((d) => ({ ...d, subject: e.target.value }))
+                                  }
+                                  placeholder="e.g. Mathematics II"
+                                  onKeyDown={(e) => {
+                                    if (e.key !== "Enter") return;
+                                    e.preventDefault();
+                                    const subject = backlogDraft.subject.trim();
+                                    if (!subject) return;
+                                    const prev: { sem: number; subject: string }[] = (() => {
+                                      try {
+                                        return JSON.parse(draft.liveBacklogsOrNa ?? "[]");
+                                      } catch {
+                                        return [];
+                                      }
+                                    })();
+                                    const next = [...prev, { sem: backlogDraft.sem, subject }];
+                                    update("liveBacklogsOrNa", JSON.stringify(next));
+                                    update("backlogs", next.length);
+                                    if (backlogDraft.sem === draft.currentSemester)
+                                      update("activeBacklogs", true);
+                                    setBacklogDraft((d) => ({ ...d, subject: "" }));
+                                  }}
+                                />
+                              </Field>
+                            </div>
+                            <Button
+                              type="button"
+                              className="w-full"
+                              onClick={() => {
+                                const subject = backlogDraft.subject.trim();
+                                if (!subject) return;
+                                const prev: { sem: number; subject: string }[] = (() => {
+                                  try {
+                                    return JSON.parse(draft.liveBacklogsOrNa ?? "[]");
+                                  } catch {
+                                    return [];
+                                  }
+                                })();
+                                const next = [...prev, { sem: backlogDraft.sem, subject }];
+                                update("liveBacklogsOrNa", JSON.stringify(next));
+                                update("backlogs", next.length);
+                                if (backlogDraft.sem === draft.currentSemester)
+                                  update("activeBacklogs", true);
+                                setBacklogDraft((d) => ({ ...d, subject: "" }));
+                              }}
+                            >
+                              <Plus className="size-4 mr-1" /> Add Backlog
+                            </Button>
+                          </div>
+
+                          {/* Entry list */}
+                          {(() => {
+                            const entries: { sem: number; subject: string }[] = (() => {
+                              try {
+                                return JSON.parse(draft.liveBacklogsOrNa ?? "[]");
+                              } catch {
+                                return [];
+                              }
+                            })();
+                            const currentSem = draft.currentSemester;
+                            if (entries.length === 0)
+                              return (
+                                <p className="text-xs text-muted-foreground">
+                                  No backlogs added. Use the form above to record any backlog
+                                  (current or past semester).
+                                </p>
+                              );
+                            return (
+                              <div className="space-y-1.5">
+                                {entries.map((entry, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-center justify-between rounded-lg border bg-background px-3 py-2"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                          entry.sem === currentSem
+                                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                        }`}
+                                      >
+                                        Sem {entry.sem}
+                                        {entry.sem === currentSem ? " (Active)" : " (Old)"}
+                                      </span>
+                                      <span className="text-sm">{entry.subject}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const next = entries.filter((_, j) => j !== i);
+                                        update(
+                                          "liveBacklogsOrNa",
+                                          next.length ? JSON.stringify(next) : "NA",
+                                        );
+                                        update("backlogs", next.length);
+                                        if (!next.some((e) => e.sem === currentSem))
+                                          update("activeBacklogs", false);
+                                      }}
+                                      className="p-1 text-muted-foreground hover:text-destructive"
+                                    >
+                                      <X className="size-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
+
+                          {/* Auto-managed status — read only */}
+                          <div className="flex items-center justify-between rounded-lg border bg-secondary/40 px-3 py-2">
+                            <span className="text-xs text-muted-foreground">
+                              Active backlogs status (auto-managed)
+                            </span>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                draft.activeBacklogs
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              }`}
+                            >
+                              {draft.activeBacklogs ? "Active" : "Clear"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
 
-                {idx === 2 && (
+                {idx === 3 && (
+                  <>
+                    {/* 10th Standard */}
+                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                      <p className="text-sm font-semibold border-b pb-2">10th (SSC)</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Board">
+                          <Input
+                            value={draft.tenth?.board ?? ""}
+                            onChange={(e) =>
+                              update("tenth", { ...draft.tenth, board: e.target.value })
+                            }
+                            placeholder="e.g. Maharashtra State Board"
+                          />
+                        </Field>
+                        <Field label="School Name">
+                          <Input
+                            value={draft.tenth?.school ?? ""}
+                            onChange={(e) =>
+                              update("tenth", { ...draft.tenth, school: e.target.value })
+                            }
+                            placeholder="e.g. Govt. High School"
+                          />
+                        </Field>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Passing Year">
+                          <Input
+                            type="number"
+                            min={2000}
+                            max={2030}
+                            value={draft.tenth?.year ?? ""}
+                            onChange={(e) =>
+                              update("tenth", { ...draft.tenth, year: e.target.value })
+                            }
+                            placeholder="e.g. 2020"
+                          />
+                        </Field>
+                        <Field label="Percentage (%)">
+                          <Input
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={0.01}
+                            value={draft.tenth?.percentage || ""}
+                            onChange={(e) =>
+                              update("tenth", { ...draft.tenth, percentage: +e.target.value })
+                            }
+                            placeholder="e.g. 85.40"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+
+                    {/* 12th / Diploma */}
+                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <p className="text-sm font-semibold">12th (HSC) / Diploma</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => update("twelfth", { ...draft.twelfth, type: "12th" })}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                              (draft.twelfth?.type ?? "12th") === "12th"
+                                ? "bg-emerald-600 text-white"
+                                : "border border-border text-muted-foreground hover:bg-secondary"
+                            }`}
+                          >
+                            12th
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => update("twelfth", { ...draft.twelfth, type: "Diploma" })}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                              draft.twelfth?.type === "Diploma"
+                                ? "bg-emerald-600 text-white"
+                                : "border border-border text-muted-foreground hover:bg-secondary"
+                            }`}
+                          >
+                            Diploma
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Board / University">
+                          <Input
+                            value={draft.twelfth?.board ?? ""}
+                            onChange={(e) =>
+                              update("twelfth", { ...draft.twelfth, board: e.target.value })
+                            }
+                            placeholder="e.g. Maharashtra State Board"
+                          />
+                        </Field>
+                        <Field label="School / College Name">
+                          <Input
+                            value={draft.twelfth?.school ?? ""}
+                            onChange={(e) =>
+                              update("twelfth", { ...draft.twelfth, school: e.target.value })
+                            }
+                            placeholder="e.g. Jr. College"
+                          />
+                        </Field>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <Field label="Passing Year">
+                          <Input
+                            type="number"
+                            min={2000}
+                            max={2030}
+                            value={draft.twelfth?.year ?? ""}
+                            onChange={(e) =>
+                              update("twelfth", { ...draft.twelfth, year: e.target.value })
+                            }
+                            placeholder="e.g. 2022"
+                          />
+                        </Field>
+                        <Field label="Percentage (%)">
+                          <Input
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={0.01}
+                            value={draft.twelfth?.percentage || ""}
+                            onChange={(e) =>
+                              update("twelfth", { ...draft.twelfth, percentage: +e.target.value })
+                            }
+                            placeholder="e.g. 78.20"
+                          />
+                        </Field>
+                        {(draft.twelfth?.type ?? "12th") === "12th" && (
+                          <Field label="Stream">
+                            <Input
+                              value={draft.twelfth?.stream ?? ""}
+                              onChange={(e) =>
+                                update("twelfth", { ...draft.twelfth, stream: e.target.value })
+                              }
+                              placeholder="e.g. Science / Commerce"
+                            />
+                          </Field>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {idx === 4 && (
                   <>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-  <span className="text-sm font-medium">Interested in Placements</span>
-  <Switch checked={!!draft.interestedInPlacements} onCheckedChange={(v) => update("interestedInPlacements", v)} />
-</div>
+                        <span className="text-sm font-medium">Interested in Placements</span>
+                        <Switch
+                          checked={!!draft.interestedInPlacements}
+                          onCheckedChange={(v) => update("interestedInPlacements", v)}
+                        />
+                      </div>
                       <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-  <span className="text-sm font-medium">Interested in Higher Studies</span>
-  <Switch checked={!!draft.interestedInHigherStudies} onCheckedChange={(v) => update("interestedInHigherStudies", v)} />
-</div>
+                        <span className="text-sm font-medium">Interested in Higher Studies</span>
+                        <Switch
+                          checked={!!draft.interestedInHigherStudies}
+                          onCheckedChange={(v) => update("interestedInHigherStudies", v)}
+                        />
+                      </div>
                       <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-  <span className="text-sm font-medium">Interested in Entrepreneurship</span>
-  <Switch checked={!!draft.interestedInEntrepreneurship} onCheckedChange={(v) => update("interestedInEntrepreneurship", v)} />
-</div>
+                        <span className="text-sm font-medium">Interested in Entrepreneurship</span>
+                        <Switch
+                          checked={!!draft.interestedInEntrepreneurship}
+                          onCheckedChange={(v) => update("interestedInEntrepreneurship", v)}
+                        />
+                      </div>
                       <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-  <span className="text-sm font-medium">Interested in Civil Services</span>
-  <Switch checked={!!draft.interestedInCivilServices} onCheckedChange={(v) => update("interestedInCivilServices", v)} />
-</div>
+                        <span className="text-sm font-medium">Interested in Civil Services</span>
+                        <Switch
+                          checked={!!draft.interestedInCivilServices}
+                          onCheckedChange={(v) => update("interestedInCivilServices", v)}
+                        />
+                      </div>
                     </div>
                     <Field label="Events & Achievements">
                       <AchievementsInput
@@ -676,7 +1123,7 @@ export function StudentProfilePage() {
                   </>
                 )}
 
-                {idx === 3 && (
+                {idx === 5 && (
                   <Field label="Experience">
                     <ExperienceInput
                       draft={experienceDraft}
@@ -689,7 +1136,7 @@ export function StudentProfilePage() {
                   </Field>
                 )}
 
-                {idx === 4 && (
+                {idx === 6 && (
                   <>
                     <Field label="Skills">
                       <SkillsInput
@@ -719,7 +1166,7 @@ export function StudentProfilePage() {
                   </>
                 )}
 
-                {idx === 5 && (
+                {idx === 7 && (
                   <>
                     <Field label="Upload ID size photo with blazer">
                       <Input
@@ -735,6 +1182,60 @@ export function StudentProfilePage() {
                         onChange={(e) => update("resumeFileName", e.target.files?.[0]?.name ?? "")}
                       />
                     </Field>
+                    <Field label="Upload 10th Marksheet">
+                      <Input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) =>
+                          update("tenthMarksheetFileName", e.target.files?.[0]?.name ?? "")
+                        }
+                      />
+                    </Field>
+                    <Field
+                      label={`Upload ${draft.twelfth?.type === "Diploma" ? "Diploma" : "12th"} Marksheet`}
+                    >
+                      <Input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) =>
+                          update("twelfthMarksheetFileName", e.target.files?.[0]?.name ?? "")
+                        }
+                      />
+                    </Field>
+                    {/* Year-wise marksheets: Year 1 to completed years */}
+                    {draft.currentSemester && Math.floor(draft.currentSemester / 2) > 0 && (
+                      <div className="rounded-lg border bg-card p-4 space-y-3">
+                        <p className="text-sm font-semibold border-b pb-2">
+                          Year Marksheets (Year 1 – {Math.floor(draft.currentSemester / 2)})
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {Array.from(
+                            { length: Math.floor(draft.currentSemester / 2) },
+                            (_, i) => i + 1,
+                          ).map((yr) => (
+                            <Field key={yr} label={`Year ${yr} Marksheet`}>
+                              <Input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) =>
+                                  update("yearMarksheetFileNames", {
+                                    ...(draft.yearMarksheetFileNames ?? {}),
+                                    [yr]: e.target.files?.[0]?.name ?? "",
+                                  })
+                                }
+                              />
+                            </Field>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <Field label="Upload Aadhar Card">
+                      <Input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => update("aadharFileName", e.target.files?.[0]?.name ?? "")}
+                      />
+                    </Field>
                     <div className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm">
                       <input
                         type="checkbox"
@@ -743,7 +1244,10 @@ export function StudentProfilePage() {
                         onChange={(e) => update("acceptsPlacementPolicy", e.target.checked)}
                         className="mt-0.5 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
                       />
-                      <label htmlFor="adcet-policy" className="text-sm font-medium leading-snug cursor-pointer">
+                      <label
+                        htmlFor="adcet-policy"
+                        className="text-sm font-medium leading-snug cursor-pointer"
+                      >
                         I accept the ADCET placement policy and terms.
                       </label>
                     </div>
@@ -813,9 +1317,17 @@ export function StudentProfilePage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="space-y-1.5">
+    <div className={cn("space-y-1.5", className)}>
       <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
     </div>
@@ -919,59 +1431,68 @@ function SkillsInput({
     <div className="space-y-4 rounded-lg border bg-card p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add New Skill</h4>
       <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-4">
-        <Input
-          className="md:col-span-2"
-          placeholder="e.g. React, Python"
-          value={draft.skill_name}
-          onChange={(e) => setDraft((d) => ({ ...d, skill_name: e.target.value }))}
-        />
-        <select
-          value={draft.skill_category}
-          onChange={(e) =>
-            setDraft((d) => ({ ...d, skill_category: e.target.value as SkillCategory }))
-          }
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="TECHNICAL">Technical</option>
-          <option value="SOFT_SKILL">Soft Skill</option>
-          <option value="LANGUAGE">Language</option>
-          <option value="TOOL">Tool</option>
-          <option value="FRAMEWORK">Framework</option>
-        </select>
-        <div className="flex gap-2">
-          <select
-            value={draft.proficiency}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, proficiency: e.target.value as SkillProficiency }))
-            }
-            className="w-full rounded-md border p-2 text-sm"
+        <Field label="Skill Name" className="md:col-span-2">
+          <Input
+            placeholder="e.g. React, Python"
+            value={draft.skill_name}
+            onChange={(e) => setDraft((d) => ({ ...d, skill_name: e.target.value }))}
+          />
+        </Field>
+        <Field label="Category">
+          <Select
+            value={draft.skill_category}
+            onValueChange={(v) => setDraft((d) => ({ ...d, skill_category: v as SkillCategory }))}
           >
-            <option value="BEGINNER">Beginner</option>
-            <option value="INTERMEDIATE">Intermediate</option>
-            <option value="ADVANCED">Advanced</option>
-            <option value="EXPERT">Expert</option>
-          </select>
-          <Button
-            type="button"
-            onClick={() => {
-              const name = draft.skill_name.trim();
-              if (!name) return toast.error("Skill name is required.");
-              if (
-                items.some(
-                  (s) =>
-                    s.skill_name.toLowerCase() === name.toLowerCase() &&
-                    s.skill_category === draft.skill_category,
-                )
-              ) {
-                return toast.error("Skill already exists.");
-              }
-              onChange([...items, { ...draft, skill_name: name }]);
-              setDraft({ skill_name: "", skill_category: "TECHNICAL", proficiency: "BEGINNER" });
-            }}
-          >
-            <Plus className="size-4" />
-          </Button>
-        </div>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="TECHNICAL">Technical</SelectItem>
+              <SelectItem value="SOFT_SKILL">Soft Skill</SelectItem>
+              <SelectItem value="LANGUAGE">Language</SelectItem>
+              <SelectItem value="TOOL">Tool</SelectItem>
+              <SelectItem value="FRAMEWORK">Framework</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Proficiency">
+          <div className="flex gap-2">
+            <Select
+              value={draft.proficiency}
+              onValueChange={(v) => setDraft((d) => ({ ...d, proficiency: v as SkillProficiency }))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Proficiency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BEGINNER">Beginner</SelectItem>
+                <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
+                <SelectItem value="ADVANCED">Advanced</SelectItem>
+                <SelectItem value="EXPERT">Expert</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              onClick={() => {
+                const name = draft.skill_name.trim();
+                if (!name) return toast.error("Skill name is required.");
+                if (
+                  items.some(
+                    (s) =>
+                      s.skill_name.toLowerCase() === name.toLowerCase() &&
+                      s.skill_category === draft.skill_category,
+                  )
+                ) {
+                  return toast.error("Skill already exists.");
+                }
+                onChange([...items, { ...draft, skill_name: name }]);
+                setDraft({ skill_name: "", skill_category: "TECHNICAL", proficiency: "BEGINNER" });
+              }}
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
+        </Field>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {items.map((skill, index) => (
@@ -1037,53 +1558,68 @@ function ProjectsInput({
     <div className="space-y-6 rounded-lg border bg-card p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Projects</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
-          className="md:col-span-2"
-          placeholder="Project Title"
-          value={draft.title}
-          onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-        />
-        <Textarea
-          rows={3}
-          className="md:col-span-2"
-          placeholder="Briefly describe what you built..."
-          value={draft.description ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-        />
-        <Input
-          className="md:col-span-2"
-          placeholder="Technologies (Comma separated)"
-          value={draft.technologies}
-          onChange={(e) => setDraft((d) => ({ ...d, technologies: e.target.value }))}
-        />
-        <select
-          value={draft.project_type}
-          onChange={(e) => setDraft((d) => ({ ...d, project_type: e.target.value as ProjectType }))}
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="PERSONAL">Personal</option>
-          <option value="ACADEMIC">Academic</option>
-          <option value="INTERNSHIP">Internship</option>
-          <option value="FREELANCE">Freelance</option>
-          <option value="OPEN_SOURCE">Open Source</option>
-        </select>
-        <Input
-          type="number"
-          placeholder="Team Size"
-          value={draft.team_size ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, team_size: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.start_date ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, start_date: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.end_date ?? ""}
-          disabled={draft.is_ongoing}
-          onChange={(e) => setDraft((d) => ({ ...d, end_date: e.target.value }))}
-        />
+        <Field label="Project Title" className="md:col-span-2">
+          <Input
+            placeholder="e.g. Portfolio Website"
+            value={draft.title}
+            onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
+          />
+        </Field>
+        <Field label="Description" className="md:col-span-2">
+          <Textarea
+            rows={3}
+            placeholder="Briefly describe what you built..."
+            value={draft.description ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+          />
+        </Field>
+        <Field label="Technologies" className="md:col-span-2">
+          <Input
+            placeholder="e.g. React, Node.js (Comma separated)"
+            value={draft.technologies}
+            onChange={(e) => setDraft((d) => ({ ...d, technologies: e.target.value }))}
+          />
+        </Field>
+        <Field label="Project Type">
+          <Select
+            value={draft.project_type}
+            onValueChange={(v) => setDraft((d) => ({ ...d, project_type: v as ProjectType }))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Project Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="PERSONAL">Personal</SelectItem>
+              <SelectItem value="ACADEMIC">Academic</SelectItem>
+              <SelectItem value="INTERNSHIP">Internship</SelectItem>
+              <SelectItem value="FREELANCE">Freelance</SelectItem>
+              <SelectItem value="OPEN_SOURCE">Open Source</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Team Size">
+          <Input
+            type="number"
+            placeholder="e.g. 1"
+            value={draft.team_size ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, team_size: e.target.value }))}
+          />
+        </Field>
+        <Field label="Start Date">
+          <DatePicker
+            placeholder="Select Start Date"
+            date={draft.start_date ? new Date(draft.start_date) : undefined}
+            setDate={(d) => setDraft((prev) => ({ ...prev, start_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
+        <Field label="End Date">
+          <DatePicker
+            placeholder="Select End Date"
+            date={draft.end_date ? new Date(draft.end_date) : undefined}
+            disabled={draft.is_ongoing}
+            setDate={(d) => setDraft((prev) => ({ ...prev, end_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
         <div className="md:col-span-2 flex items-center gap-2">
           <input
             id="is_ongoing_project"
@@ -1096,16 +1632,20 @@ function ProjectsInput({
             This project is ongoing
           </label>
         </div>
-        <Input
-          placeholder="Live Link (Optional)"
-          value={draft.project_url ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, project_url: e.target.value }))}
-        />
-        <Input
-          placeholder="GitHub Link (Optional)"
-          value={draft.github_url ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, github_url: e.target.value }))}
-        />
+        <Field label="Live Link (Optional)">
+          <Input
+            placeholder="e.g. https://example.com"
+            value={draft.project_url ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, project_url: e.target.value }))}
+          />
+        </Field>
+        <Field label="GitHub Link (Optional)">
+          <Input
+            placeholder="e.g. https://github.com/user/repo"
+            value={draft.github_url ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, github_url: e.target.value }))}
+          />
+        </Field>
       </div>
       <Button
         type="button"
@@ -1234,38 +1774,50 @@ function CertificationsInput({
     <div className="space-y-6 rounded-lg border bg-card p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Certifications</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
-          className="md:col-span-2"
-          placeholder="Certification Name"
-          value={draft.name}
-          onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-        />
-        <Input
-          className="md:col-span-2"
-          placeholder="Issuing Organization"
-          value={draft.organization}
-          onChange={(e) => setDraft((d) => ({ ...d, organization: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.issue_date}
-          onChange={(e) => setDraft((d) => ({ ...d, issue_date: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.expiry_date ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, expiry_date: e.target.value }))}
-        />
-        <Input
-          placeholder="Credential ID (Optional)"
-          value={draft.credential_id ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, credential_id: e.target.value }))}
-        />
-        <Input
-          placeholder="Credential URL (Optional)"
-          value={draft.credential_url ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, credential_url: e.target.value }))}
-        />
+        <Field label="Certification Name" className="md:col-span-2">
+          <Input
+            placeholder="e.g. AWS Certified Solutions Architect"
+            value={draft.name}
+            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+          />
+        </Field>
+        <Field label="Issuing Organization" className="md:col-span-2">
+          <Input
+            placeholder="e.g. Amazon Web Services"
+            value={draft.organization}
+            onChange={(e) => setDraft((d) => ({ ...d, organization: e.target.value }))}
+          />
+        </Field>
+        <Field label="Issue Date">
+          <DatePicker
+            placeholder="Select Issue Date"
+            date={draft.issue_date ? new Date(draft.issue_date) : undefined}
+            setDate={(d) => setDraft((prev) => ({ ...prev, issue_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
+        <Field label="Expiry Date">
+          <DatePicker
+            placeholder="Select Expiry Date"
+            date={draft.expiry_date ? new Date(draft.expiry_date) : undefined}
+            setDate={(d) =>
+              setDraft((prev) => ({ ...prev, expiry_date: d ? d.toISOString() : "" }))
+            }
+          />
+        </Field>
+        <Field label="Credential ID (Optional)">
+          <Input
+            placeholder="e.g. AWS-123456"
+            value={draft.credential_id ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, credential_id: e.target.value }))}
+          />
+        </Field>
+        <Field label="Credential URL (Optional)">
+          <Input
+            placeholder="e.g. https://aws.amazon.com/verification"
+            value={draft.credential_url ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, credential_url: e.target.value }))}
+          />
+        </Field>
       </div>
       <Button
         type="button"
@@ -1365,55 +1917,74 @@ function ExperienceInput({
     <div className="space-y-6 rounded-lg border bg-card p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add Experience</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
-          className="md:col-span-2"
-          placeholder="Company Name"
-          value={draft.company_name}
-          onChange={(e) => setDraft((d) => ({ ...d, company_name: e.target.value }))}
-        />
-        <Input
-          placeholder="Role"
-          value={draft.role}
-          onChange={(e) => setDraft((d) => ({ ...d, role: e.target.value }))}
-        />
-        <select
-          value={draft.experience_type}
-          onChange={(e) =>
-            setDraft((d) => ({ ...d, experience_type: e.target.value as ExperienceType }))
-          }
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="INTERNSHIP">Internship</option>
-          <option value="FULL_TIME">Full Time</option>
-          <option value="PART_TIME">Part Time</option>
-          <option value="FREELANCE">Freelance</option>
-          <option value="TRAINING">Training</option>
-        </select>
-        <Input
-          type="date"
-          value={draft.start_date}
-          onChange={(e) => setDraft((d) => ({ ...d, start_date: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.end_date ?? ""}
-          disabled={draft.is_current}
-          onChange={(e) => setDraft((d) => ({ ...d, end_date: e.target.value }))}
-        />
-        <Input
-          placeholder="Place / Location"
-          value={draft.location}
-          onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))}
-        />
-        <select
-          value={draft.work_mode}
-          onChange={(e) => setDraft((d) => ({ ...d, work_mode: e.target.value as WorkMode }))}
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="WFO">WFO</option>
-          <option value="WFH">WFH</option>
-          <option value="HYBRID">Hybrid</option>
-        </select>
+        <Field label="Company Name" className="md:col-span-2">
+          <Input
+            placeholder="e.g. Google"
+            value={draft.company_name}
+            onChange={(e) => setDraft((d) => ({ ...d, company_name: e.target.value }))}
+          />
+        </Field>
+        <Field label="Role">
+          <Input
+            placeholder="e.g. Software Engineer Intern"
+            value={draft.role}
+            onChange={(e) => setDraft((d) => ({ ...d, role: e.target.value }))}
+          />
+        </Field>
+        <Field label="Experience Type">
+          <Select
+            value={draft.experience_type}
+            onValueChange={(v) => setDraft((d) => ({ ...d, experience_type: v as ExperienceType }))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Experience Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="INTERNSHIP">Internship</SelectItem>
+              <SelectItem value="FULL_TIME">Full Time</SelectItem>
+              <SelectItem value="PART_TIME">Part Time</SelectItem>
+              <SelectItem value="FREELANCE">Freelance</SelectItem>
+              <SelectItem value="TRAINING">Training</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Start Date">
+          <DatePicker
+            placeholder="Select Start Date"
+            date={draft.start_date ? new Date(draft.start_date) : undefined}
+            setDate={(d) => setDraft((prev) => ({ ...prev, start_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
+        <Field label="End Date">
+          <DatePicker
+            placeholder="Select End Date"
+            date={draft.end_date ? new Date(draft.end_date) : undefined}
+            disabled={draft.is_current}
+            setDate={(d) => setDraft((prev) => ({ ...prev, end_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
+        <Field label="Location">
+          <Input
+            placeholder="e.g. Bengaluru, India"
+            value={draft.location}
+            onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))}
+          />
+        </Field>
+        <Field label="Work Mode">
+          <Select
+            value={draft.work_mode}
+            onValueChange={(v) => setDraft((d) => ({ ...d, work_mode: v as WorkMode }))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Work Mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="WFO">WFO</SelectItem>
+              <SelectItem value="WFH">WFH</SelectItem>
+              <SelectItem value="HYBRID">Hybrid</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
         <div className="md:col-span-2 flex items-center gap-2">
           <input
             id="is_current_experience"
@@ -1426,13 +1997,14 @@ function ExperienceInput({
             Currently working here
           </label>
         </div>
-        <Textarea
-          rows={3}
-          className="md:col-span-2"
-          placeholder="Projects worked on / key responsibilities / outcomes"
-          value={draft.projects_worked ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, projects_worked: e.target.value }))}
-        />
+        <Field label="Description" className="md:col-span-2">
+          <Textarea
+            rows={3}
+            placeholder="Projects worked on / key responsibilities / outcomes"
+            value={draft.projects_worked ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, projects_worked: e.target.value }))}
+          />
+        </Field>
       </div>
       <Button
         type="button"
@@ -1535,45 +2107,62 @@ function AchievementsInput({
     <div className="space-y-6 rounded-lg border bg-card p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add Event / Achievement</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
-          className="md:col-span-2"
-          placeholder="Event Name"
-          value={draft.event_name}
-          onChange={(e) => setDraft((d) => ({ ...d, event_name: e.target.value }))}
-        />
-        <Input
-          type="date"
-          value={draft.event_date}
-          onChange={(e) => setDraft((d) => ({ ...d, event_date: e.target.value }))}
-        />
-        <Input
-          placeholder="Place"
-          value={draft.place}
-          onChange={(e) => setDraft((d) => ({ ...d, place: e.target.value }))}
-        />
-        <select
-          value={draft.level}
-          onChange={(e) => setDraft((d) => ({ ...d, level: e.target.value as EventLevel }))}
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="INTERNATIONAL">International</option>
-          <option value="NATIONAL">National</option>
-          <option value="STATE">State</option>
-          <option value="DISTRICT">District</option>
-          <option value="COLLEGE">College</option>
-          <option value="LOCAL">Local</option>
-        </select>
-        <select
-          value={draft.category}
-          onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value as EventCategory }))}
-          className="w-full rounded-md border p-2 text-sm"
-        >
-          <option value="EVENT">Event</option>
-          <option value="PAPER_PRESENTATION">Paper Presentation</option>
-          <option value="HACKATHON">Hackathon</option>
-          <option value="WORKSHOP">Workshop</option>
-          <option value="COMPETITION">Competition</option>
-        </select>
+        <Field label="Event Name" className="md:col-span-2">
+          <Input
+            placeholder="e.g. Smart India Hackathon"
+            value={draft.event_name}
+            onChange={(e) => setDraft((d) => ({ ...d, event_name: e.target.value }))}
+          />
+        </Field>
+        <Field label="Event Date">
+          <DatePicker
+            placeholder="Select Event Date"
+            date={draft.event_date ? new Date(draft.event_date) : undefined}
+            setDate={(d) => setDraft((prev) => ({ ...prev, event_date: d ? d.toISOString() : "" }))}
+          />
+        </Field>
+        <Field label="Place">
+          <Input
+            placeholder="e.g. New Delhi, India"
+            value={draft.place}
+            onChange={(e) => setDraft((d) => ({ ...d, place: e.target.value }))}
+          />
+        </Field>
+        <Field label="Level">
+          <Select
+            value={draft.level}
+            onValueChange={(v) => setDraft((d) => ({ ...d, level: v as EventLevel }))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="INTERNATIONAL">International</SelectItem>
+              <SelectItem value="NATIONAL">National</SelectItem>
+              <SelectItem value="STATE">State</SelectItem>
+              <SelectItem value="DISTRICT">District</SelectItem>
+              <SelectItem value="COLLEGE">College</SelectItem>
+              <SelectItem value="LOCAL">Local</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Category">
+          <Select
+            value={draft.category}
+            onValueChange={(v) => setDraft((d) => ({ ...d, category: v as EventCategory }))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="EVENT">Event</SelectItem>
+              <SelectItem value="PAPER_PRESENTATION">Paper Presentation</SelectItem>
+              <SelectItem value="HACKATHON">Hackathon</SelectItem>
+              <SelectItem value="WORKSHOP">Workshop</SelectItem>
+              <SelectItem value="COMPETITION">Competition</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
         <div className="md:col-span-2 flex items-center gap-2">
           <input
             id="achievement_won"
@@ -1586,19 +2175,21 @@ function AchievementsInput({
             Won / Awarded
           </label>
         </div>
-        <Input
-          className="md:col-span-2"
-          placeholder="Position / Award (Optional)"
-          value={draft.position_or_award ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, position_or_award: e.target.value }))}
-        />
-        <Textarea
-          rows={3}
-          className="md:col-span-2"
-          placeholder="Short details (optional)"
-          value={draft.details ?? ""}
-          onChange={(e) => setDraft((d) => ({ ...d, details: e.target.value }))}
-        />
+        <Field label="Position / Award (Optional)" className="md:col-span-2">
+          <Input
+            placeholder="e.g. 1st Prize, Gold Medal"
+            value={draft.position_or_award ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, position_or_award: e.target.value }))}
+          />
+        </Field>
+        <Field label="Short Details (Optional)" className="md:col-span-2">
+          <Textarea
+            rows={3}
+            placeholder="Description of the event and your contribution"
+            value={draft.details ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, details: e.target.value }))}
+          />
+        </Field>
       </div>
       <Button
         type="button"

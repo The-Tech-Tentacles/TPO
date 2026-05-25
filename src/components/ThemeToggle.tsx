@@ -25,15 +25,24 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="flex items-center justify-between">
+        <DropdownMenuItem
+          onClick={() => setTheme("light")}
+          className="flex items-center justify-between"
+        >
           Light
           {theme === "light" && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="flex items-center justify-between">
+        <DropdownMenuItem
+          onClick={() => setTheme("dark")}
+          className="flex items-center justify-between"
+        >
           Dark
           {theme === "dark" && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="flex items-center justify-between">
+        <DropdownMenuItem
+          onClick={() => setTheme("system")}
+          className="flex items-center justify-between"
+        >
           System
           {theme === "system" && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>

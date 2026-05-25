@@ -1,13 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import {
-  STUDENTS,
-  FACULTY,
-  COMPANIES,
-  POSTS,
-  PENDING,
-  SETTINGS,
-  DEMO_USERS,
-} from "./dummy-data";
+import { STUDENTS, FACULTY, COMPANIES, POSTS, PENDING, SETTINGS, DEMO_USERS } from "./dummy-data";
 import type {
   Student,
   TPOFaculty,

@@ -218,5 +218,3 @@ function GeneralForm() {
     </Card>
   );
 }
-
-

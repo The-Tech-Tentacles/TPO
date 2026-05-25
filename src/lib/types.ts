@@ -56,6 +56,7 @@ export interface Student {
   fullNameFormatted?: string;
   companyName?: string;
   urnNumber?: string;
+  dob?: string;
   parentName?: string;
   parentRelation?: string;
   parentEmail?: string;
@@ -83,6 +84,20 @@ export interface Student {
   projects?: string;
   photoFileName?: string;
   resumeFileName?: string;
+  fatherName?: string;
+  fatherOccupation?: string;
+  fatherMobile?: string;
+  fatherEmail?: string;
+  fatherSalary?: number;
+  motherName?: string;
+  motherOccupation?: string;
+  motherMobile?: string;
+  motherEmail?: string;
+  motherSalary?: number;
+  tenthMarksheetFileName?: string;
+  twelfthMarksheetFileName?: string;
+  aadharFileName?: string;
+  yearMarksheetFileNames?: Record<number, string>;
 }
 
 export interface TPOFaculty {
@@ -140,7 +155,6 @@ export interface Post {
   pollOptions?: PollOption[];
   pollVotedOptionId?: string;
 }
-
 
 export interface PendingItem {
   id: string;

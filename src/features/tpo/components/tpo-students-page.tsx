@@ -7,6 +7,7 @@ import { useApp, isEligible } from "@/lib/store";
 import { DEPARTMENTS } from "@/lib/dummy-data";
 import type { Student } from "@/lib/types";
 import { Card } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -587,7 +588,11 @@ function UpdateStatusDialog({
                 </div>
                 <div>
                   <Label className="text-xs">Offer letter date</Label>
-                  <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                  <DatePicker
+                    placeholder="Offer Letter Date"
+                    date={date ? new Date(date) : undefined}
+                    setDate={(d) => setDate(d ? d.toISOString() : "")}
+                  />
                 </div>
               </div>
             </>
