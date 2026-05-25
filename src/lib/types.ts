@@ -23,7 +23,14 @@ export interface Student {
   backlogs: number;
   activeBacklogs: boolean;
   tenth: { board: string; school: string; year: string; percentage: number };
-  twelfth: { board: string; school: string; year: string; percentage: number; stream: string; type: "12th" | "Diploma" };
+  twelfth: {
+    board: string;
+    school: string;
+    year: string;
+    percentage: number;
+    stream: string;
+    type: "12th" | "Diploma";
+  };
   gender: "Male" | "Female" | "Other";
   mobile: string;
   city: string;
@@ -41,6 +48,41 @@ export interface Student {
   packageLpa?: number;
   blacklisted?: boolean;
   avatarUrl?: string;
+  firstName?: string;
+  middleName?: string;
+  surname?: string;
+  emailAddress?: string;
+  emailId?: string;
+  fullNameFormatted?: string;
+  companyName?: string;
+  urnNumber?: string;
+  parentName?: string;
+  parentRelation?: string;
+  parentEmail?: string;
+  parentsMobile?: string;
+  caste?: string;
+  interestedInPlacements?: boolean;
+  interestedInHigherStudies?: boolean;
+  interestedInEntrepreneurship?: boolean;
+  interestedInCivilServices?: boolean;
+  internshipsCount?: number;
+  foreignLanguageCertificateDetails?: string;
+  nptelAndCertificationDetails?: string;
+  professionalBodyMembership?: string;
+  paperPresentationsParticipatedCount?: number;
+  paperPresentationsWonCount?: number;
+  eventsParticipatedCount?: number;
+  eventsWonCount?: number;
+  acceptsPlacementPolicy?: boolean;
+  parentsIncomeRange?: string;
+  aggregateTillCurrentSemester?: number;
+  currentSemester?: number;
+  liveBacklogsOrNa?: string;
+  parentOccupation?: string;
+  areaSpecialization?: string;
+  projects?: string;
+  photoFileName?: string;
+  resumeFileName?: string;
 }
 
 export interface TPOFaculty {
@@ -76,9 +118,15 @@ export interface Comment {
   createdAt: string;
 }
 
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+}
+
 export interface Post {
   id: string;
-  type: "Post" | "Notice" | "Message";
+  type: "Post" | "Notice" | "Poll";
   title: string;
   body: string;
   authorName: string;
@@ -89,16 +137,10 @@ export interface Post {
   likedByMe?: boolean;
   comments: Comment[];
   audience?: string[];
+  pollOptions?: PollOption[];
+  pollVotedOptionId?: string;
 }
 
-export interface NotificationItem {
-  id: string;
-  title: string;
-  body?: string;
-  createdAt: string;
-  read: boolean;
-  type: "approval" | "rejection" | "notice" | "info";
-}
 
 export interface PendingItem {
   id: string;
@@ -124,6 +166,5 @@ export interface AppSettings {
   tpoEmail: string;
   emailDomainRestrict: boolean;
   allowedDomains: string[];
-  notify: { onApproval: boolean; onRejection: boolean; onPlacement: boolean };
   eligibility: EligibilityCriteria;
 }

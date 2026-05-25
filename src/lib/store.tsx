@@ -1,12 +1,25 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  STUDENTS, FACULTY, COMPANIES, POSTS, NOTIFICATIONS, PENDING, SETTINGS, DEMO_USERS,
+  STUDENTS,
+  FACULTY,
+  COMPANIES,
+  POSTS,
+  PENDING,
+  SETTINGS,
+  DEMO_USERS,
 } from "./dummy-data";
 import type {
-  Student, TPOFaculty, Company, Post, NotificationItem, PendingItem, AppSettings, User, Role,
+  Student,
+  TPOFaculty,
+  Company,
+  Post,
+  PendingItem,
+  AppSettings,
+  User,
+  Role,
 } from "./types";
 
-const LS_KEY = "placeme:state:v1";
+const LS_KEY = "placeme:state:v2";
 const LS_AUTH = "placeme:auth:v1";
 
 interface State {
@@ -14,7 +27,7 @@ interface State {
   faculty: TPOFaculty[];
   companies: Company[];
   posts: Post[];
-  notifications: NotificationItem[];
+
   pending: PendingItem[];
   settings: AppSettings;
 }
@@ -24,7 +37,7 @@ const initial: State = {
   faculty: FACULTY,
   companies: COMPANIES,
   posts: POSTS,
-  notifications: NOTIFICATIONS,
+
   pending: PENDING,
   settings: SETTINGS,
 };
@@ -46,7 +59,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) return { ...initial, ...JSON.parse(raw) };
-    } catch {}
+    } catch {
+      // Ignore malformed localStorage payloads and fall back to defaults.
+    }
     return initial;
   });
   const [user, setUser] = useState<User | null>(() => {
@@ -54,23 +69,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(LS_AUTH);
       return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   });
 
   useEffect(() => {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+    } catch {
+      // Ignore storage write failures.
+    }
   }, [state]);
   useEffect(() => {
     try {
       if (user) localStorage.setItem(LS_AUTH, JSON.stringify(user));
       else localStorage.removeItem(LS_AUTH);
-    } catch {}
+    } catch {
+      // Ignore storage write failures.
+    }
   }, [user]);
 
   const setState = (updater: (s: State) => State) => setStateRaw(updater);
 
   const login: Ctx["login"] = (email, password) => {
-    const u = DEMO_USERS.find((d) => d.email.toLowerCase() === email.toLowerCase() && d.password === password);
+    const u = DEMO_USERS.find(
+      (d) => d.email.toLowerCase() === email.toLowerCase() && d.password === password,
+    );
     if (!u) return { ok: false, error: "Invalid email or password" };
     const { password: _p, ...rest } = u;
     setUser(rest);
@@ -98,7 +123,9 @@ export function useApp() {
 
 export function isEligible(s: Student, c = SETTINGS.eligibility) {
   if (s.activeBacklogs) return false;
-  return s.tenth.percentage >= c.tenthMin && s.twelfth.percentage >= c.twelfthMin && s.cgpa >= c.cgpaMin;
+  return (
+    s.tenth.percentage >= c.tenthMin && s.twelfth.percentage >= c.twelfthMin && s.cgpa >= c.cgpaMin
+  );
 }
 
 export function timeAgo(iso: string) {
@@ -113,5 +140,10 @@ export function timeAgo(iso: string) {
 }
 
 export function initials(name: string) {
-  return name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(" ")
+    .map((s) => s[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
