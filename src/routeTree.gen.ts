@@ -14,6 +14,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentHomeRouteImport } from './routes/student.home'
 
 const TpoRoute = TpoRouteImport.update({
@@ -41,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentProfileRoute = StudentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentHomeRoute = StudentHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/tpo': typeof TpoRoute
   '/student/home': typeof StudentHomeRoute
+  '/student/profile': typeof StudentProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/student': typeof StudentRouteWithChildren
   '/tpo': typeof TpoRoute
   '/student/home': typeof StudentHomeRoute
+  '/student/profile': typeof StudentProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/tpo': typeof TpoRoute
   '/student/home': typeof StudentHomeRoute
+  '/student/profile': typeof StudentProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +90,16 @@ export interface FileRouteTypes {
     | '/student'
     | '/tpo'
     | '/student/home'
+    | '/student/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/student' | '/tpo' | '/student/home'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/student'
+    | '/tpo'
+    | '/student/home'
+    | '/student/profile'
   id:
     | '__root__'
     | '/'
@@ -91,6 +108,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/tpo'
     | '/student/home'
+    | '/student/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -138,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/profile': {
+      id: '/student/profile'
+      path: '/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/home': {
       id: '/student/home'
       path: '/home'
@@ -150,10 +175,12 @@ declare module '@tanstack/react-router' {
 
 interface StudentRouteChildren {
   StudentHomeRoute: typeof StudentHomeRoute
+  StudentProfileRoute: typeof StudentProfileRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentHomeRoute: StudentHomeRoute,
+  StudentProfileRoute: StudentProfileRoute,
 }
 
 const StudentRouteWithChildren =
