@@ -47,7 +47,7 @@ export function StudentHomePage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by faculty, title, or desc."
-            className="pl-9 bg-card border-border/60 shadow-sm"
+            className="pl-9 bg-white/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 focus-visible:ring-emerald-500/20 shadow-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -56,7 +56,7 @@ export function StudentHomePage() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="shrink-0 gap-2 bg-card border-border/60 shadow-sm px-3 sm:px-4"
+              className="shrink-0 gap-2 bg-white/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 focus-visible:ring-emerald-500/20 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 shadow-sm px-3 sm:px-4"
             >
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="hidden sm:inline-block">{active === "All" ? "Filter" : active}</span>

@@ -1,12 +1,17 @@
-import type { Student, TPOFaculty, Company, Post, PendingItem, AppSettings, User } from "./types";
+import type { Student, TPOFaculty, Company, Post, PendingItem, AppSettings, User, CalendarEvent } from "./types";
 
 export const SETTINGS: AppSettings = {
-  collegeName: "ADCET — Ashokrao Mane College of Engineering",
+  collegeName: "ADCET — AnnaSaheb Dange College of Engineering and Technology",
   academicYear: "2024-25",
   tpoEmail: "tpo@adcet.ac.in",
   emailDomainRestrict: true,
   allowedDomains: ["adcet.ac.in"],
   eligibility: { tenthMin: 60, twelfthMin: 60, cgpaMin: 6.0, combined: false },
+  dreamPackageLpa: 8.0,
+  superDreamPackageLpa: 15.0,
+  maxBacklogsAllowed: 0,
+  allowMultipleOffers: true,
+  placementSeasonActive: true,
 };
 
 export const FACULTY: TPOFaculty[] = [
@@ -48,7 +53,7 @@ export const COMPANIES: Company[] = [
   {
     id: "c1",
     name: "TCS",
-    industry: "IT Services",
+    industry: "Information Technology / Software",
     website: "tcs.com",
     location: "Pune",
     ctcMin: 3.5,
@@ -62,7 +67,7 @@ export const COMPANIES: Company[] = [
   {
     id: "c2",
     name: "Infosys",
-    industry: "IT Services",
+    industry: "Information Technology / Software",
     website: "infosys.com",
     location: "Bengaluru",
     ctcMin: 3.6,
@@ -76,7 +81,7 @@ export const COMPANIES: Company[] = [
   {
     id: "c3",
     name: "Cognizant",
-    industry: "IT Services",
+    industry: "Information Technology / Software",
     website: "cognizant.com",
     location: "Chennai",
     ctcMin: 4,
@@ -90,7 +95,7 @@ export const COMPANIES: Company[] = [
   {
     id: "c4",
     name: "L&T",
-    industry: "Engineering & Construction",
+    industry: "Civil & Infrastructure",
     website: "larsentoubro.com",
     location: "Mumbai",
     ctcMin: 4.5,
@@ -109,7 +114,7 @@ export const STUDENTS: Student[] = [
     userId: "u-student",
     name: "Aryan Patil",
     email: "aryan@adcet.ac.in",
-    prn: "PRN2021001",
+    urn: "URN2021001",
     rollNumber: "CSE-21-01",
     department: "Computer Engineering",
     year: "Fourth",
@@ -117,6 +122,9 @@ export const STUDENTS: Student[] = [
     cgpa: 8.4,
     backlogs: 0,
     activeBacklogs: false,
+    admissionMonth: "July",
+    admissionYear: "2021",
+    passoutYear: "2025",
     tenth: {
       board: "Maharashtra Board",
       school: "New English School",
@@ -151,7 +159,7 @@ export const STUDENTS: Student[] = [
     userId: "u2",
     name: "Sneha Joshi",
     email: "sneha@adcet.ac.in",
-    prn: "PRN2021002",
+    urn: "URN2021002",
     rollNumber: "CSE-21-02",
     department: "Computer Engineering",
     year: "Fourth",
@@ -159,6 +167,9 @@ export const STUDENTS: Student[] = [
     cgpa: 9.1,
     backlogs: 0,
     activeBacklogs: false,
+    admissionMonth: "July",
+    admissionYear: "2021",
+    passoutYear: "2025",
     tenth: { board: "CBSE", school: "DAV Public School", year: "2019", percentage: 92 },
     twelfth: {
       board: "CBSE",
@@ -186,7 +197,7 @@ export const STUDENTS: Student[] = [
     userId: "u3",
     name: "Rahul Kamble",
     email: "rahul@adcet.ac.in",
-    prn: "PRN2021003",
+    urn: "URN2021003",
     rollNumber: "MEC-21-08",
     department: "Mechanical",
     year: "Fourth",
@@ -194,6 +205,9 @@ export const STUDENTS: Student[] = [
     cgpa: 6.8,
     backlogs: 1,
     activeBacklogs: false,
+    admissionMonth: "July",
+    admissionYear: "2021",
+    passoutYear: "2025",
     tenth: { board: "Maharashtra Board", school: "Shahu Vidyalaya", year: "2019", percentage: 72 },
     twelfth: {
       board: "MSBTE",
@@ -219,7 +233,7 @@ export const STUDENTS: Student[] = [
     userId: "u4",
     name: "Priya More",
     email: "priya@adcet.ac.in",
-    prn: "PRN2021004",
+    urn: "URN2021004",
     rollNumber: "ENT-21-15",
     department: "Electronics",
     year: "Third",
@@ -227,6 +241,9 @@ export const STUDENTS: Student[] = [
     cgpa: 7.9,
     backlogs: 0,
     activeBacklogs: false,
+    admissionMonth: "July",
+    admissionYear: "2022",
+    passoutYear: "2026",
     tenth: { board: "Maharashtra Board", school: "St. Xavier's", year: "2020", percentage: 84 },
     twelfth: {
       board: "Maharashtra Board",
@@ -252,7 +269,7 @@ export const STUDENTS: Student[] = [
     userId: "u5",
     name: "Omkar Shinde",
     email: "omkar@adcet.ac.in",
-    prn: "PRN2022014",
+    urn: "URN2022014",
     rollNumber: "CIV-22-03",
     department: "Civil",
     year: "Third",
@@ -260,6 +277,9 @@ export const STUDENTS: Student[] = [
     cgpa: 5.4,
     backlogs: 3,
     activeBacklogs: true,
+    admissionMonth: "July",
+    admissionYear: "2022",
+    passoutYear: "2026",
     tenth: { board: "Maharashtra Board", school: "Modern High", year: "2020", percentage: 58 },
     twelfth: {
       board: "Maharashtra Board",
@@ -336,7 +356,7 @@ export const PENDING: PendingItem[] = [
     kind: "new",
     studentId: "s4",
     studentName: "Priya More",
-    prn: "PRN2021004",
+    urn: "URN2021004",
     department: "Electronics",
     submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
   },
@@ -345,7 +365,7 @@ export const PENDING: PendingItem[] = [
     kind: "update",
     studentId: "s1",
     studentName: "Aryan Patil",
-    prn: "PRN2021001",
+    urn: "URN2021001",
     department: "Computer Engineering",
     submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
     changes: [
@@ -388,4 +408,84 @@ export const DEPARTMENTS = [
   "Electronics",
   "Information Technology",
   "Electrical",
+];
+
+const today = new Date();
+const fmt = (offset: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split("T")[0];
+};
+
+export const EVENTS: CalendarEvent[] = [
+  {
+    id: "ev1",
+    title: "TCS NQT Campus Drive",
+    date: fmt(2),
+    time: "09:00 AM – 05:00 PM",
+    location: "Main Auditorium, ADCET",
+    isOnline: false,
+    type: "Placement",
+    description: "TCS Ninja & Digital campus recruitment. Bring offer letter printout, 2 copies of resume, and all original mark sheets.",
+    targetAudience: "Final Year – CSE, IT, ENTC",
+    createdBy: "Prof. Rajeev Khedkar",
+    createdByRole: "TPO Co-Admin",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10).toISOString(),
+  },
+  {
+    id: "ev2",
+    title: "Resume Building Workshop",
+    date: fmt(5),
+    time: "02:00 PM – 04:00 PM",
+    location: "Online – Google Meet",
+    isOnline: true,
+    type: "Workshop",
+    description: "Learn how to craft an ATS-friendly resume. Guest speaker from LinkedIn India.",
+    targetAudience: "All Students",
+    createdBy: "Dr. Anita Deshpande",
+    createdByRole: "TPO Admin",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
+  },
+  {
+    id: "ev3",
+    title: "Mock Interview Session",
+    date: fmt(8),
+    time: "10:00 AM – 01:00 PM",
+    location: "Seminar Hall 2, Block B",
+    isOnline: false,
+    type: "Training",
+    description: "HR & Technical mock interviews conducted by industry professionals. Slots of 20 minutes each.",
+    targetAudience: "Final Year – All Branches",
+    createdBy: "Prof. Smita Patil",
+    createdByRole: "Dept. TPO – CSE",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+  },
+  {
+    id: "ev4",
+    title: "Aptitude Test Series – Round 3",
+    date: fmt(12),
+    time: "04:00 PM – 05:30 PM",
+    location: "Online – HackerEarth",
+    isOnline: true,
+    type: "Assessment",
+    description: "Third round of the weekly aptitude series. Topics: Data Interpretation, Logical Reasoning.",
+    targetAudience: "All Students",
+    createdBy: "Prof. Nilesh Kale",
+    createdByRole: "Moderator",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+  },
+  {
+    id: "ev5",
+    title: "Infosys Pre-Placement Talk",
+    date: fmt(15),
+    time: "11:00 AM – 12:30 PM",
+    location: "Auditorium-1, ADCET",
+    isOnline: false,
+    type: "Placement",
+    description: "Infosys hiring managers will present the role, growth path, and compensation structure. Q&A session included.",
+    targetAudience: "Final Year – All Branches",
+    createdBy: "Prof. Smita Patil",
+    createdByRole: "Dept. TPO – CSE",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
+  },
 ];

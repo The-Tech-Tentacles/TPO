@@ -33,13 +33,13 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50/50 pb-24 md:pb-8 dark:bg-slate-950">
       {/* Top Header - Glass Floating */}
-      <header className="sticky top-4 z-30 mx-auto w-[calc(100%-2rem)] max-w-5xl flex h-12 items-center justify-between rounded-full border border-white/40 bg-white/10 px-4 md:px-5 backdrop-blur-2xl shadow-xl shadow-emerald-900/5 ring-1 ring-white/50 dark:border-white/10 dark:bg-slate-900/10 dark:ring-white/20 transition-all">
-        <div className="flex items-center gap-2">
+      <header className="sticky top-4 z-30 mx-auto w-[calc(100%-2rem)] max-w-7xl flex h-14 items-center justify-between rounded-full border border-white/40 bg-white/10 px-4 md:px-5 backdrop-blur-2xl shadow-xl shadow-emerald-900/5 ring-1 ring-white/50 dark:border-white/10 dark:bg-slate-900/10 dark:ring-white/20 transition-all">
+        <div className="flex items-center gap-4">
           <Logo />
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-1.5">
           {tabs.map((tab) => {
             const active = pathname.startsWith(tab.href);
             const Icon = tab.icon;
@@ -66,13 +66,13 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <UserNav />
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-8xl px-4 py-8">{children}</main>
 
       {/* Floating Bottom Navigation - Glass Theme (Mobile Only) */}
       <nav className="md:hidden fixed inset-x-0 bottom-4 z-30 mx-auto max-w-sm px-4">

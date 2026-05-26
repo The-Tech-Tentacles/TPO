@@ -15,6 +15,7 @@ export const routes = {
     faculty: "/tpo/faculty",
     companies: "/tpo/companies",
     feed: "/tpo/feed",
+    calendar: "/tpo/calendar",
     settings: "/tpo/settings",
   },
 } as const;

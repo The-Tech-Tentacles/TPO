@@ -103,7 +103,7 @@ export function UserNav() {
           </div>
         )}
 
-        <DropdownMenuItem onClick={() => router.push(routes.student.profile)}>
+        <DropdownMenuItem onClick={() => router.push(user.role === "student" ? routes.student.profile : routes.tpo.settings)}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>

@@ -45,14 +45,12 @@ import { cn } from "@/lib/utils";
 const toPhone = (v: string) =>
   v.replace(/\D/g, "").replace(/^91/, "").replace(/^0/, "").slice(0, 10);
 
-type SkillCategory = "TECHNICAL" | "SOFT_SKILL" | "LANGUAGE" | "TOOL" | "FRAMEWORK";
-type SkillProficiency = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
+type SkillCategory = "TECHNICAL" | "SOFT_SKILL" | "TOOL" | "FRAMEWORK";
 type ProjectType = "ACADEMIC" | "PERSONAL" | "INTERNSHIP" | "FREELANCE" | "OPEN_SOURCE";
 
 type SkillItem = {
   skill_name: string;
   skill_category: SkillCategory;
-  proficiency?: SkillProficiency;
 };
 type ProjectItem = {
   title: string;
@@ -101,6 +99,11 @@ type AchievementItem = {
   details?: string;
 };
 
+type LinkItem = {
+  title: string;
+  url: string;
+};
+
 const parseJsonLines = <T,>(value: string | undefined, fallback: (line: string) => T): T[] =>
   (value ?? "")
     .split("\n")
@@ -127,7 +130,7 @@ const emptyStudent = (name: string, email: string, id: string): Student => ({
   userId: id,
   name,
   email,
-  prn: "",
+  urn: "",
   rollNumber: "",
   department: "",
   year: "Fourth",
@@ -135,6 +138,9 @@ const emptyStudent = (name: string, email: string, id: string): Student => ({
   cgpa: 0,
   backlogs: 0,
   activeBacklogs: false,
+  admissionMonth: "",
+  admissionYear: "",
+  passoutYear: "",
   tenth: { board: "", school: "", year: "", percentage: 0 },
   twelfth: { board: "", school: "", year: "", percentage: 0, stream: "Science", type: "12th" },
   gender: "Male",
@@ -142,6 +148,8 @@ const emptyStudent = (name: string, email: string, id: string): Student => ({
   city: "",
   state: "",
   pin: "",
+  dist: "",
+  addressLine: "",
   category: "General",
   skills: [],
   languages: [],
@@ -213,7 +221,6 @@ export function StudentProfilePage() {
   const [skillDraft, setSkillDraft] = useState<SkillItem>({
     skill_name: "",
     skill_category: "TECHNICAL",
-    proficiency: "BEGINNER",
   });
   const [projectDraft, setProjectDraft] = useState<ProjectItem>({
     title: "",
@@ -263,6 +270,9 @@ export function StudentProfilePage() {
   const [deletingCertIndex, setDeletingCertIndex] = useState<number | null>(null);
   const [deletingExperienceIndex, setDeletingExperienceIndex] = useState<number | null>(null);
   const [deletingAchievementIndex, setDeletingAchievementIndex] = useState<number | null>(null);
+  const [deletingLinkIndex, setDeletingLinkIndex] = useState<number | null>(null);
+  const [linkDraft, setLinkDraft] = useState<LinkItem>({ title: "", url: "" });
+  const [languageDraft, setLanguageDraft] = useState("");
   const [professionalBodyDraft, setProfessionalBodyDraft] = useState("");
   const [backlogDraft, setBacklogDraft] = useState({ sem: 1, subject: "" });
   const [backlogOpen, setBacklogOpen] = useState(false);
@@ -274,7 +284,6 @@ export function StudentProfilePage() {
   const skillItems = parseJsonLines<SkillItem>(draft.skills.join("\n"), (line) => ({
     skill_name: line,
     skill_category: "TECHNICAL",
-    proficiency: "BEGINNER",
   }));
   const projectItems = parseJsonLines<ProjectItem>(draft.projects, (line) => ({
     title: line,
@@ -316,6 +325,7 @@ export function StudentProfilePage() {
     }),
   );
   const professionalBodyItems = parsePlainLines(draft.professionalBodyMembership);
+  const linkItems = parseJsonLines<LinkItem>(draft.additionalLinks, (line) => ({ title: line, url: "" }));
 
   const sections = useMemo(
     () => [
@@ -331,9 +341,12 @@ export function StudentProfilePage() {
         title: "Academic & Eligibility",
         done: !!(
           draft.department &&
-          draft.prn &&
+          draft.urn &&
           draft.aggregateTillCurrentSemester &&
-          draft.urnNumber
+          draft.urnNumber &&
+          draft.admissionYear &&
+          draft.admissionMonth &&
+          draft.passoutYear
         ),
       },
       {
@@ -346,6 +359,10 @@ export function StudentProfilePage() {
       },
       { title: "Experience", done: experienceItems.length > 0 },
       { title: "Skills + Projects", done: draft.skills.length > 0 || !!draft.projects },
+      {
+        title: "Links",
+        done: !!(draft.linkedin || draft.github || draft.portfolio || linkItems.length > 0),
+      },
       { title: "Uploads", done: !!(draft.photoFileName && draft.resumeFileName) },
     ],
     [
@@ -354,6 +371,7 @@ export function StudentProfilePage() {
       draft,
       experienceItems.length,
       professionalBodyItems.length,
+      linkItems.length,
     ],
   );
 
@@ -385,9 +403,11 @@ export function StudentProfilePage() {
       </div>
     );
 
+  const glassCard = "rounded-2xl border border-white/40 bg-white/50 shadow-xl shadow-emerald-900/5 backdrop-blur-2xl ring-1 ring-white/50 dark:border-white/10 dark:bg-slate-900/50 dark:ring-white/10 transition-all";
+
   return (
     <div className="space-y-4 pb-32">
-      <Card className="rounded-2xl p-5">
+      <Card className={cn(glassCard, "p-5")}>
         <div className="flex items-center gap-3">
           <AvatarCircle name={draft.name} size={56} />
           <div className="flex-1 min-w-0">
@@ -395,28 +415,28 @@ export function StudentProfilePage() {
             <p className="truncate text-xs text-muted-foreground">{draft.email}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 dark:bg-emerald-900/30">
-              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+            <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 dark:bg-blue-950/40">
+              <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
                 Completion
               </span>
-              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+              <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
                 {pct}%
               </span>
             </div>
           </div>
         </div>
-        <Progress value={pct} className="mt-4 h-2" />
+        <Progress value={pct} className="mt-4 h-2 animate-pulse" />
       </Card>
 
       <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 text-sm text-amber-800 dark:border-amber-900/30 dark:bg-amber-900/10 dark:text-amber-400">
-        <span className="font-semibold">Note:</span> Before exiting, make sure you save your draft
+        <span className="font-semibold">NOTE:</span> Before exiting, make sure you save your draft
         so you don't lose your progress.
       </div>
 
       {sections.map((sec, idx) => {
         const open = openSection === idx;
         return (
-          <Card key={sec.title} className="overflow-hidden rounded-2xl p-0">
+          <Card key={sec.title} className={cn(glassCard, "overflow-hidden p-0")}>
             <button
               onClick={() => setOpenSection(open ? null : idx)}
               className="flex w-full items-center gap-3 p-4 text-left hover:bg-secondary/50"
@@ -425,7 +445,7 @@ export function StudentProfilePage() {
                 className={cn(
                   "grid size-7 place-items-center rounded-full border",
                   sec.done
-                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    ? "border-blue-600 bg-blue-600 text-white"
                     : "border-border bg-card text-muted-foreground",
                 )}
               >
@@ -515,13 +535,67 @@ export function StudentProfilePage() {
                         />
                       </Field>
                     </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="Gender">
+                        <Select
+                          value={draft.gender}
+                          onValueChange={(v) => update("gender", v as Student["gender"])}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Male">Male</SelectItem>
+                            <SelectItem value="Female">Female</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                      <Field label="Address Line">
+                        <Input
+                          value={draft.addressLine ?? ""}
+                          onChange={(e) => update("addressLine", e.target.value)}
+                          placeholder="e.g. 123 Main Street, Apt 4B"
+                        />
+                      </Field>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-4">
+                      <Field label="State">
+                        <Input
+                          value={draft.state ?? ""}
+                          onChange={(e) => update("state", e.target.value)}
+                          placeholder="e.g. Maharashtra"
+                        />
+                      </Field>
+                      <Field label="City">
+                        <Input
+                          value={draft.city ?? ""}
+                          onChange={(e) => update("city", e.target.value)}
+                          placeholder="e.g. Pune"
+                        />
+                      </Field>
+                      <Field label="District">
+                        <Input
+                          value={draft.dist ?? ""}
+                          onChange={(e) => update("dist", e.target.value)}
+                          placeholder="e.g. Pune"
+                        />
+                      </Field>
+                      <Field label="Pincode">
+                        <Input
+                          value={draft.pin ?? ""}
+                          onChange={(e) => update("pin", e.target.value)}
+                          placeholder="e.g. 411001"
+                        />
+                      </Field>
+                    </div>
                   </>
                 )}
 
                 {idx === 1 && (
                   <>
                     {/* Father Details */}
-                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3">
                       <p className="text-sm font-semibold border-b pb-2">Father's Details</p>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field label="Father's Name">
@@ -580,7 +654,7 @@ export function StudentProfilePage() {
                     </div>
 
                     {/* Mother Details */}
-                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3">
                       <p className="text-sm font-semibold border-b pb-2">Mother's Details</p>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field label="Mother's Name">
@@ -666,6 +740,45 @@ export function StudentProfilePage() {
                         </SelectContent>
                       </Select>
                     </Field>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <Field label="Admission Month">
+                        <Select
+                          value={draft.admissionMonth ?? ""}
+                          onValueChange={(v) => update("admissionMonth", v)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Month" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((m) => (
+                              <SelectItem key={m} value={m}>
+                                {m}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                      <Field label="Admission Year">
+                        <Input
+                          type="number"
+                          min={2000}
+                          max={2100}
+                          value={draft.admissionYear ?? ""}
+                          onChange={(e) => update("admissionYear", e.target.value)}
+                          placeholder="e.g. 2021"
+                        />
+                      </Field>
+                      <Field label="Passout / Graduation Year">
+                        <Input
+                          type="number"
+                          min={2000}
+                          max={2100}
+                          value={draft.passoutYear ?? ""}
+                          onChange={(e) => update("passoutYear", e.target.value)}
+                          placeholder="e.g. 2025"
+                        />
+                      </Field>
+                    </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Current Semester">
                         <Input
@@ -704,7 +817,7 @@ export function StudentProfilePage() {
                       />
                     </Field>
                     {/* Backlogs — collapsible */}
-                    <div className="rounded-lg border bg-card overflow-hidden">
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 overflow-hidden">
                       <button
                         type="button"
                         onClick={() => setBacklogOpen((o) => !o)}
@@ -852,11 +965,10 @@ export function StudentProfilePage() {
                                   >
                                     <div className="flex items-center gap-2">
                                       <span
-                                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                          entry.sem === currentSem
-                                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                        }`}
+                                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${entry.sem === currentSem
+                                          ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                          }`}
                                       >
                                         Sem {entry.sem}
                                         {entry.sem === currentSem ? " (Active)" : " (Old)"}
@@ -891,11 +1003,10 @@ export function StudentProfilePage() {
                               Active backlogs status (auto-managed)
                             </span>
                             <span
-                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                                draft.activeBacklogs
-                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              }`}
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${draft.activeBacklogs
+                                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                }`}
                             >
                               {draft.activeBacklogs ? "Active" : "Clear"}
                             </span>
@@ -909,7 +1020,7 @@ export function StudentProfilePage() {
                 {idx === 3 && (
                   <>
                     {/* 10th Standard */}
-                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3">
                       <p className="text-sm font-semibold border-b pb-2">10th (SSC)</p>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field label="Board">
@@ -961,29 +1072,27 @@ export function StudentProfilePage() {
                     </div>
 
                     {/* 12th / Diploma */}
-                    <div className="rounded-lg border bg-card p-4 space-y-3">
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3">
                       <div className="flex items-center justify-between border-b pb-2">
                         <p className="text-sm font-semibold">12th (HSC) / Diploma</p>
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => update("twelfth", { ...draft.twelfth, type: "12th" })}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                              (draft.twelfth?.type ?? "12th") === "12th"
-                                ? "bg-emerald-600 text-white"
-                                : "border border-border text-muted-foreground hover:bg-secondary"
-                            }`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${(draft.twelfth?.type ?? "12th") === "12th"
+                              ? "bg-emerald-600 text-white"
+                              : "border border-border text-muted-foreground hover:bg-secondary"
+                              }`}
                           >
                             12th
                           </button>
                           <button
                             type="button"
                             onClick={() => update("twelfth", { ...draft.twelfth, type: "Diploma" })}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                              draft.twelfth?.type === "Diploma"
-                                ? "bg-emerald-600 text-white"
-                                : "border border-border text-muted-foreground hover:bg-secondary"
-                            }`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${draft.twelfth?.type === "Diploma"
+                              ? "bg-emerald-600 text-white"
+                              : "border border-border text-muted-foreground hover:bg-secondary"
+                              }`}
                           >
                             Diploma
                           </button>
@@ -1054,28 +1163,28 @@ export function StudentProfilePage() {
                 {idx === 4 && (
                   <>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-3 shadow-sm">
                         <span className="text-sm font-medium">Interested in Placements</span>
                         <Switch
                           checked={!!draft.interestedInPlacements}
                           onCheckedChange={(v) => update("interestedInPlacements", v)}
                         />
                       </div>
-                      <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-3 shadow-sm">
                         <span className="text-sm font-medium">Interested in Higher Studies</span>
                         <Switch
                           checked={!!draft.interestedInHigherStudies}
                           onCheckedChange={(v) => update("interestedInHigherStudies", v)}
                         />
                       </div>
-                      <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-3 shadow-sm">
                         <span className="text-sm font-medium">Interested in Entrepreneurship</span>
                         <Switch
                           checked={!!draft.interestedInEntrepreneurship}
                           onCheckedChange={(v) => update("interestedInEntrepreneurship", v)}
                         />
                       </div>
-                      <div className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-3 shadow-sm">
                         <span className="text-sm font-medium">Interested in Civil Services</span>
                         <Switch
                           checked={!!draft.interestedInCivilServices}
@@ -1153,6 +1262,17 @@ export function StudentProfilePage() {
                         }
                       />
                     </Field>
+                    <Field label="Languages Known">
+                      <SimpleListInput
+                        title="Languages"
+                        placeholder="e.g. English, Marathi, Hindi"
+                        draft={languageDraft}
+                        setDraft={setLanguageDraft}
+                        items={draft.languages ?? []}
+                        onChange={(next) => update("languages", next)}
+                        emptyText="No languages added yet."
+                      />
+                    </Field>
                     <Field label="Projects">
                       <ProjectsInput
                         draft={projectDraft}
@@ -1167,6 +1287,129 @@ export function StudentProfilePage() {
                 )}
 
                 {idx === 7 && (
+                  <>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <Field label="LinkedIn URL">
+                        <Input
+                          value={draft.linkedin ?? ""}
+                          onChange={(e) => update("linkedin", e.target.value)}
+                          placeholder="https://linkedin.com/in/..."
+                        />
+                      </Field>
+                      <Field label="GitHub URL">
+                        <Input
+                          value={draft.github ?? ""}
+                          onChange={(e) => update("github", e.target.value)}
+                          placeholder="https://github.com/..."
+                        />
+                      </Field>
+                      <Field label="Portfolio URL">
+                        <Input
+                          value={draft.portfolio ?? ""}
+                          onChange={(e) => update("portfolio", e.target.value)}
+                          placeholder="https://yourportfolio.com"
+                        />
+                      </Field>
+                    </div>
+
+                    {linkItems.length > 0 && (
+                      <div className="grid gap-2 sm:grid-cols-2 mt-4">
+                        {linkItems.map((item, i) => (
+                          <div
+                            key={i}
+                            className="group flex items-center justify-between rounded-lg border bg-muted/50 p-2.5 transition-colors hover:bg-muted"
+                          >
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-sm font-medium truncate">{item.title}</span>
+                              <a href={item.url} target="_blank" rel="noreferrer" className="text-xs text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 hover:underline truncate">
+                                {item.url}
+                              </a>
+                            </div>
+                            {deletingLinkIndex === i ? (
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                  onClick={() => setDeletingLinkIndex(null)}
+                                >
+                                  <X className="size-4" />
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7 hover:bg-rose-50 text-rose-600 dark:hover:bg-rose-950/35 dark:text-rose-400"
+                                  onClick={() => {
+                                    const next = linkItems.filter((_, idx) => idx !== i);
+                                    update("additionalLinks", stringifyJsonLines(next));
+                                    setDeletingLinkIndex(null);
+                                  }}
+                                >
+                                  <Check className="size-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-7 opacity-0 transition-opacity group-hover:opacity-100"
+                                onClick={() => setDeletingLinkIndex(i)}
+                              >
+                                <X className="size-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3 mt-4">
+                      <p className="text-sm font-semibold border-b pb-2">Add New Link</p>
+
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <Field label="Link Title">
+                          <Input
+                            value={linkDraft.title}
+                            onChange={(e) => setLinkDraft((d) => ({ ...d, title: e.target.value }))}
+                            placeholder="e.g. HackerRank / LeetCode"
+                          />
+                        </Field>
+                        <Field label="URL">
+                          <Input
+                            value={linkDraft.url}
+                            onChange={(e) => setLinkDraft((d) => ({ ...d, url: e.target.value }))}
+                            placeholder="https://..."
+                            onKeyDown={(e) => {
+                              if (e.key !== "Enter") return;
+                              e.preventDefault();
+                              if (!linkDraft.title || !linkDraft.url) return;
+                              const next = [...linkItems, linkDraft];
+                              update("additionalLinks", stringifyJsonLines(next));
+                              setLinkDraft({ title: "", url: "" });
+                            }}
+                          />
+                        </Field>
+                      </div>
+                      <Button
+                        type="button"
+                        className="w-full"
+                        onClick={() => {
+                          if (!linkDraft.title || !linkDraft.url) return;
+                          const next = [...linkItems, linkDraft];
+                          update("additionalLinks", stringifyJsonLines(next));
+                          setLinkDraft({ title: "", url: "" });
+                        }}
+                      >
+                        <Plus className="size-4 mr-1" /> Add Link
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {idx === 8 && (
                   <>
                     <Field label="Upload ID size photo with blazer">
                       <Input
@@ -1204,7 +1447,7 @@ export function StudentProfilePage() {
                     </Field>
                     {/* Year-wise marksheets: Year 1 to completed years */}
                     {draft.currentSemester && Math.floor(draft.currentSemester / 2) > 0 && (
-                      <div className="rounded-lg border bg-card p-4 space-y-3">
+                      <div className="rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 space-y-3">
                         <p className="text-sm font-semibold border-b pb-2">
                           Year Marksheets (Year 1 – {Math.floor(draft.currentSemester / 2)})
                         </p>
@@ -1236,13 +1479,13 @@ export function StudentProfilePage() {
                         onChange={(e) => update("aadharFileName", e.target.files?.[0]?.name ?? "")}
                       />
                     </Field>
-                    <div className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm">
+                    <div className="flex items-start gap-3 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4 shadow-sm">
                       <input
                         type="checkbox"
                         id="adcet-policy"
                         checked={!!draft.acceptsPlacementPolicy}
                         onChange={(e) => update("acceptsPlacementPolicy", e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
                       />
                       <label
                         htmlFor="adcet-policy"
@@ -1260,11 +1503,11 @@ export function StudentProfilePage() {
       })}
 
       {/* Action Bar - Glass Theme */}
-      <div className="mx-auto max-w-2xl mt-8 pb-8 transition-all px-4">
-        <div className="flex w-full items-center gap-3 rounded-full border border-white/60 bg-white/40 p-2 shadow-sm shadow-emerald-900/5 backdrop-blur-xl ring-1 ring-white/50 dark:border-white/10 dark:bg-slate-900/40 dark:ring-white/10">
+      <div className="fixed bottom-20 md:bottom-6 left-0 right-0 z-50 mx-auto max-w-2xl transition-all px-4 flex flex-col gap-3 pointer-events-none">
+        <div className="pointer-events-auto flex w-full items-center gap-3 rounded-full border border-white/40 bg-white/50 p-2 shadow-xl shadow-emerald-900/5 backdrop-blur-2xl ring-1 ring-white/50 dark:border-white/10 dark:bg-slate-900/50 dark:ring-white/10">
           <Button
             variant="outline"
-            className="flex-1 rounded-full border-white/60 bg-white/50 hover:bg-emerald-50 hover:text-emerald-700 shadow-sm transition-all dark:border-emerald-800/30 dark:bg-slate-800/50 dark:hover:bg-emerald-900/30 dark:text-slate-200"
+            className="flex-1 rounded-full border-slate-200/60 bg-white/50 hover:bg-slate-100/50 dark:border-slate-800 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-200 transition-all font-semibold shadow-sm"
             onClick={() => {
               persist({ ...draft, status: "draft" });
               toast.success("Draft saved successfully");
@@ -1273,7 +1516,7 @@ export function StudentProfilePage() {
             Save Draft
           </Button>
           <Button
-            className="flex-1 rounded-full bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-emerald-600/20 text-white transition-all font-medium"
+            className="flex-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 transition-all font-semibold hover:scale-[1.01] active:scale-[0.99]"
             onClick={() => setConfirmOpen(true)}
             disabled={pct < 100}
             title={pct < 100 ? "Complete 100% profile to submit for verification" : undefined}
@@ -1352,7 +1595,7 @@ function SimpleListInput({
   emptyText: string;
 }) {
   return (
-    <div className="space-y-3 rounded-lg border bg-card p-4">
+    <div className="space-y-3 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">{title}</h4>
       <div className="flex gap-2">
         <Input
@@ -1372,41 +1615,41 @@ function SimpleListInput({
             setDraft("");
           }}
         />
-        <Button
-          type="button"
-          onClick={() => {
-            const value = draft.trim();
-            if (!value) return;
-            if (items.some((i) => i.toLowerCase() === value.toLowerCase())) {
-              toast.error("This item already exists.");
-              return;
-            }
-            onChange([...items, value]);
-            setDraft("");
-          }}
-        >
-          <Plus className="mr-2 size-4" />
-          Add
-        </Button>
       </div>
-      <div className="space-y-2">
+      <Button
+        type="button"
+        className="w-full mt-2"
+        onClick={() => {
+          const value = draft.trim();
+          if (!value) return;
+          if (items.some((i) => i.toLowerCase() === value.toLowerCase())) {
+            toast.error("This item already exists.");
+            return;
+          }
+          onChange([...items, value]);
+          setDraft("");
+        }}
+      >
+        <Plus className="size-4 mr-1" /> Add Item
+      </Button>
+      <div className="flex flex-wrap gap-2">
         {items.map((item, index) => (
           <div
             key={`${item}-${index}`}
-            className="flex items-center justify-between rounded-lg border bg-background p-3"
+            className="group flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700 transition-colors dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300"
           >
-            <p className="text-sm">{item}</p>
+            <span className="text-sm font-medium">{item}</span>
             <button
               type="button"
               onClick={() => onChange(items.filter((_, i) => i !== index))}
-              className="p-1 text-muted-foreground hover:text-destructive"
+              className="rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 text-muted-foreground hover:text-destructive"
               title="Remove item"
             >
-              <X className="size-4" />
+              <X className="size-3.5" />
             </button>
           </div>
         ))}
-        {items.length === 0 ? <p className="text-xs text-muted-foreground">{emptyText}</p> : null}
+        {items.length === 0 ? <p className="w-full text-xs text-muted-foreground">{emptyText}</p> : null}
       </div>
     </div>
   );
@@ -1428,10 +1671,10 @@ function SkillsInput({
   onChange: (next: SkillItem[]) => void;
 }) {
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4">
+    <div className="space-y-4 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add New Skill</h4>
-      <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-4">
-        <Field label="Skill Name" className="md:col-span-2">
+      <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2">
+        <Field label="Skill Name">
           <Input
             placeholder="e.g. React, Python"
             value={draft.skill_name}
@@ -1447,75 +1690,51 @@ function SkillsInput({
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="TECHNICAL">Technical</SelectItem>
-              <SelectItem value="SOFT_SKILL">Soft Skill</SelectItem>
-              <SelectItem value="LANGUAGE">Language</SelectItem>
-              <SelectItem value="TOOL">Tool</SelectItem>
-              <SelectItem value="FRAMEWORK">Framework</SelectItem>
+              <SelectItem value="TECHNICAL" className="text-blue-700 dark:text-blue-400 font-medium">Technical</SelectItem>
+              <SelectItem value="SOFT_SKILL" className="text-amber-700 dark:text-amber-400 font-medium">Soft Skill</SelectItem>
+              <SelectItem value="TOOL" className="text-teal-700 dark:text-teal-400 font-medium">Tool</SelectItem>
+              <SelectItem value="FRAMEWORK" className="text-slate-700 dark:text-slate-350 font-medium">Framework</SelectItem>
             </SelectContent>
           </Select>
         </Field>
-        <Field label="Proficiency">
-          <div className="flex gap-2">
-            <Select
-              value={draft.proficiency}
-              onValueChange={(v) => setDraft((d) => ({ ...d, proficiency: v as SkillProficiency }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Proficiency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="BEGINNER">Beginner</SelectItem>
-                <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
-                <SelectItem value="ADVANCED">Advanced</SelectItem>
-                <SelectItem value="EXPERT">Expert</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              onClick={() => {
-                const name = draft.skill_name.trim();
-                if (!name) return toast.error("Skill name is required.");
-                if (
-                  items.some(
-                    (s) =>
-                      s.skill_name.toLowerCase() === name.toLowerCase() &&
-                      s.skill_category === draft.skill_category,
-                  )
-                ) {
-                  return toast.error("Skill already exists.");
-                }
-                onChange([...items, { ...draft, skill_name: name }]);
-                setDraft({ skill_name: "", skill_category: "TECHNICAL", proficiency: "BEGINNER" });
-              }}
-            >
-              <Plus className="size-4" />
-            </Button>
-          </div>
-        </Field>
       </div>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <Button
+        type="button"
+        className="w-full"
+        onClick={() => {
+          const name = draft.skill_name.trim();
+          if (!name) return toast.error("Skill name is required.");
+          if (
+            items.some(
+              (s) =>
+                s.skill_name.toLowerCase() === name.toLowerCase() &&
+                s.skill_category === draft.skill_category,
+            )
+          ) {
+            return toast.error("Skill already exists.");
+          }
+          onChange([...items, { ...draft, skill_name: name }]);
+          setDraft({ skill_name: "", skill_category: "TECHNICAL" });
+        }}
+      >
+        <Plus className="size-4 mr-1" /> Add Skill
+      </Button>
+      <div className="flex flex-wrap gap-2">
         {items.map((skill, index) => (
           <div
             key={`${skill.skill_name}-${index}`}
-            className="relative rounded-lg border bg-background p-3 pr-10"
+            className={cn(
+              "group flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors",
+              skill.skill_category === "TECHNICAL" && "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
+              skill.skill_category === "SOFT_SKILL" && "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-850",
+              skill.skill_category === "TOOL" && "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/20 dark:text-teal-300 dark:border-teal-850",
+              skill.skill_category === "FRAMEWORK" && "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700"
+            )}
           >
-            <div className="min-w-0 space-y-2">
-              <p className="truncate text-sm font-medium">{skill.skill_name}</p>
-              <div className="flex flex-wrap gap-1.5 text-xs text-muted-foreground">
-                <span className="rounded-full bg-secondary px-2 py-0.5">
-                  {skill.skill_category}
-                </span>
-                {skill.proficiency ? (
-                  <span className="rounded-full bg-blue-50 px-2 py-0.5 text-blue-700">
-                    {skill.proficiency}
-                  </span>
-                ) : null}
-              </div>
-            </div>
+            <span className="truncate text-sm font-medium">{skill.skill_name}</span>
             <button
               type="button"
-              className="absolute right-2 top-2 p-1 text-muted-foreground hover:text-destructive"
+              className="rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10"
               onClick={() => {
                 setDeletingIndex(index);
                 onChange(items.filter((_, i) => i !== index));
@@ -1524,15 +1743,15 @@ function SkillsInput({
               title="Remove skill"
             >
               {deletingIndex === index ? (
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-3.5 animate-spin" />
               ) : (
-                <X className="size-4" />
+                <X className="size-3.5" />
               )}
             </button>
           </div>
         ))}
         {items.length === 0 ? (
-          <p className="col-span-full text-xs text-muted-foreground">No skills added yet.</p>
+          <p className="w-full text-xs text-muted-foreground">No skills added yet.</p>
         ) : null}
       </div>
     </div>
@@ -1555,7 +1774,7 @@ function ProjectsInput({
   onChange: (next: ProjectItem[]) => void;
 }) {
   return (
-    <div className="space-y-6 rounded-lg border bg-card p-4">
+    <div className="space-y-6 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Projects</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field label="Project Title" className="md:col-span-2">
@@ -1626,7 +1845,7 @@ function ProjectsInput({
             type="checkbox"
             checked={draft.is_ongoing}
             onChange={(e) => setDraft((d) => ({ ...d, is_ongoing: e.target.checked }))}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
           />
           <label htmlFor="is_ongoing_project" className="text-sm">
             This project is ongoing
@@ -1649,6 +1868,7 @@ function ProjectsInput({
       </div>
       <Button
         type="button"
+        className="w-full"
         onClick={() => {
           if (!draft.title.trim() || !draft.technologies.trim())
             return toast.error("Title and technologies are required.");
@@ -1675,8 +1895,7 @@ function ProjectsInput({
           });
         }}
       >
-        <Plus className="mr-2 size-4" />
-        Save Project
+        <Plus className="size-4 mr-1" /> Add Project
       </Button>
       <div className="space-y-3">
         {items.map((project, index) => (
@@ -1771,7 +1990,7 @@ function CertificationsInput({
   onChange: (next: CertificationItem[]) => void;
 }) {
   return (
-    <div className="space-y-6 rounded-lg border bg-card p-4">
+    <div className="space-y-6 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Certifications</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field label="Certification Name" className="md:col-span-2">
@@ -1821,6 +2040,7 @@ function CertificationsInput({
       </div>
       <Button
         type="button"
+        className="w-full"
         onClick={() => {
           if (!draft.name.trim() || !draft.organization.trim() || !draft.issue_date)
             return toast.error("Name, organization and issue date are required.");
@@ -1840,8 +2060,7 @@ function CertificationsInput({
           });
         }}
       >
-        <Plus className="mr-2 size-4" />
-        Save Certification
+        <Plus className="size-4 mr-1" /> Add Certification
       </Button>
       <div className="space-y-3">
         {items.map((cert, index) => (
@@ -1914,7 +2133,7 @@ function ExperienceInput({
   onChange: (next: ExperienceItem[]) => void;
 }) {
   return (
-    <div className="space-y-6 rounded-lg border bg-card p-4">
+    <div className="space-y-6 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add Experience</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field label="Company Name" className="md:col-span-2">
@@ -1991,7 +2210,7 @@ function ExperienceInput({
             type="checkbox"
             checked={draft.is_current}
             onChange={(e) => setDraft((d) => ({ ...d, is_current: e.target.checked }))}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
           />
           <label htmlFor="is_current_experience" className="text-sm">
             Currently working here
@@ -2008,6 +2227,7 @@ function ExperienceInput({
       </div>
       <Button
         type="button"
+        className="w-full"
         onClick={() => {
           if (!draft.company_name.trim() || !draft.role.trim() || !draft.start_date) {
             toast.error("Company, role and start date are required.");
@@ -2038,8 +2258,7 @@ function ExperienceInput({
           });
         }}
       >
-        <Plus className="mr-2 size-4" />
-        Save Experience
+        <Plus className="size-4 mr-1" /> Add Experience
       </Button>
 
       <div className="space-y-3">
@@ -2104,7 +2323,7 @@ function AchievementsInput({
   onChange: (next: AchievementItem[]) => void;
 }) {
   return (
-    <div className="space-y-6 rounded-lg border bg-card p-4">
+    <div className="space-y-6 rounded-lg border border-slate-200/60 bg-blue-50/20 dark:border-slate-800/60 dark:bg-blue-950/10 p-4">
       <h4 className="border-b pb-2 text-sm font-medium">Add Event / Achievement</h4>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field label="Event Name" className="md:col-span-2">
@@ -2169,7 +2388,7 @@ function AchievementsInput({
             type="checkbox"
             checked={draft.won}
             onChange={(e) => setDraft((d) => ({ ...d, won: e.target.checked }))}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
           />
           <label htmlFor="achievement_won" className="text-sm">
             Won / Awarded
@@ -2193,6 +2412,7 @@ function AchievementsInput({
       </div>
       <Button
         type="button"
+        className="w-full"
         onClick={() => {
           if (!draft.event_name.trim() || !draft.event_date || !draft.place.trim()) {
             toast.error("Event name, date and place are required.");
@@ -2218,8 +2438,7 @@ function AchievementsInput({
           });
         }}
       >
-        <Plus className="mr-2 size-4" />
-        Save Event
+        <Plus className="size-4 mr-1" /> Add Event
       </Button>
 
       <div className="space-y-3">

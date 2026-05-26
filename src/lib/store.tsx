@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { STUDENTS, FACULTY, COMPANIES, POSTS, PENDING, SETTINGS, DEMO_USERS } from "./dummy-data";
+import { STUDENTS, FACULTY, COMPANIES, POSTS, PENDING, SETTINGS, DEMO_USERS, EVENTS } from "./dummy-data";
 import type {
   Student,
   TPOFaculty,
@@ -9,9 +9,10 @@ import type {
   AppSettings,
   User,
   Role,
+  CalendarEvent,
 } from "./types";
 
-const LS_KEY = "placeme:state:v2";
+const LS_KEY = "placeme:state:v3";
 const LS_AUTH = "placeme:auth:v1";
 
 interface State {
@@ -19,9 +20,9 @@ interface State {
   faculty: TPOFaculty[];
   companies: Company[];
   posts: Post[];
-
   pending: PendingItem[];
   settings: AppSettings;
+  events: CalendarEvent[];
 }
 
 const initial: State = {
@@ -29,9 +30,9 @@ const initial: State = {
   faculty: FACULTY,
   companies: COMPANIES,
   posts: POSTS,
-
   pending: PENDING,
   settings: SETTINGS,
+  events: EVENTS,
 };
 
 interface Ctx {

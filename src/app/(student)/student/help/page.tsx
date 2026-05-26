@@ -41,12 +41,6 @@ const FAQS = [
 export default function HelpPage() {
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto w-full">
-      <div className="flex flex-col gap-2">
-        <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
-          Find answers to common questions or reach out to the training and placement cell directly
-          for assistance.
-        </p>
-      </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_300px]">
         <div className="flex flex-col gap-6">

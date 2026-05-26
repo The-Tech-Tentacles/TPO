@@ -14,7 +14,7 @@ export interface Student {
   userId: string;
   name: string;
   email: string;
-  prn: string;
+  urn: string;
   rollNumber: string;
   department: string;
   year: "First" | "Second" | "Third" | "Fourth";
@@ -22,6 +22,9 @@ export interface Student {
   cgpa: number;
   backlogs: number;
   activeBacklogs: boolean;
+  admissionMonth?: string;
+  admissionYear?: string;
+  passoutYear?: string;
   tenth: { board: string; school: string; year: string; percentage: number };
   twelfth: {
     board: string;
@@ -36,12 +39,15 @@ export interface Student {
   city: string;
   state: string;
   pin: string;
+  dist?: string;
+  addressLine?: string;
   category: string;
   skills: string[];
   languages: string[];
   linkedin?: string;
   github?: string;
   portfolio?: string;
+  additionalLinks?: string;
   status: "draft" | "pending" | "verified" | "rejected";
   placementStatus: "Placed" | "Not Placed" | "In Process";
   placedCompany?: string;
@@ -161,7 +167,7 @@ export interface PendingItem {
   kind: "new" | "update";
   studentId: string;
   studentName: string;
-  prn: string;
+  urn: string;
   department: string;
   submittedAt: string;
   changes?: { field: string; before: string; after: string }[];
@@ -181,4 +187,27 @@ export interface AppSettings {
   emailDomainRestrict: boolean;
   allowedDomains: string[];
   eligibility: EligibilityCriteria;
+  dreamPackageLpa: number;
+  superDreamPackageLpa: number;
+  maxBacklogsAllowed: number;
+  allowMultipleOffers: boolean;
+  placementSeasonActive: boolean;
+}
+
+
+export type EventType = "Placement" | "Workshop" | "Training" | "Assessment" | "Other";
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string; // ISO date string YYYY-MM-DD
+  time: string;
+  location: string;
+  isOnline: boolean;
+  type: EventType;
+  description?: string;
+  targetAudience?: string; // e.g. "All", "CSE", "Final Year"
+  createdBy: string; // faculty name
+  createdByRole: string;
+  createdAt: string;
 }
